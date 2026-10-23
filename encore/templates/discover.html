@@ -55,7 +55,12 @@ async function sendEvent(kind, artist, btn) {
 
 function render(data) {
   picksEl.innerHTML = '';
-  if (data.error) { statusEl.textContent = data.error; return; }
+  if (data.error) {
+    statusEl.innerHTML = '<b>Could not load picks.</b> ' + data.error;
+    statusEl.className = 'status error';
+    return;
+  }
+  statusEl.className = 'status';
   statusEl.style.display = 'none';
 
   data.picks.forEach(p => {
@@ -74,7 +79,7 @@ function render(data) {
     if (p.research && p.research.hometown) {
       // Source data can be very precise ("Blue Mountains region, New South
       // Wales, Australia"); the city is the part a reader wants.
-      const where = p.research.hometown.split(',').slice(0, 2).join(',').trim();
+      const where = p.research.hometown.split(',')[0].trim();
       badges.appendChild(badge(where, 'muted'));
     }
 

@@ -22,6 +22,7 @@ main{max-width:860px;margin:0 auto;padding:28px 20px 60px}
 .ghost:hover{border-color:var(--blue-300)}
 
 .status{color:#5b6b85;padding:18px 0}
+.status.error{color:#8a3a22;background:#fdf0dc;border-radius:10px;padding:14px 18px}
 .spinner{display:inline-block;width:13px;height:13px;margin-right:8px;
   border:2px solid var(--blue-300);border-top-color:transparent;border-radius:50%;
   animation:spin .8s linear infinite;vertical-align:-2px}

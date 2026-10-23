@@ -37,7 +37,10 @@ def get_profile(rows: list[dict], meter: llm.Meter) -> dict:
     if hit is not None:
         return hit
     profile = profiler.build(rows, meter=meter)
-    _store(PROFILE_CACHE, key, profile)
+    # Never cache a failed profile: a missing key or a transient API error
+    # would otherwise be frozen in for the life of the cache.
+    if profile.get("summary"):
+        _store(PROFILE_CACHE, key, profile)
     return profile
 
 
@@ -59,7 +62,25 @@ def get_picks(force: bool = False) -> dict:
             return hit
 
     profile = get_profile(rows, meter)
+    if not profile.get("summary"):
+        reason = profile.get("error", "")
+        detail = ("the app could not reach the model — check that "
+                  "PORTKEY_API_KEY is set"
+                  if reason == "RuntimeError" else
+                  f"could not build your taste profile ({reason or 'unknown'})")
+        return {"picks": [], "profile": profile, "considered": 0,
+                "injections": [], "meter": meter.totals(), "cost": 0.0,
+                "seconds": round(time.time() - started, 1),
+                "from_cache": False, "error": detail}
+
     swept = pipeline.sweep(meter=meter)
+    if not swept["shows"]:
+        return {"picks": [], "profile": profile, "considered": 0,
+                "injections": [], "meter": meter.totals(), "cost": 0.0,
+                "seconds": round(time.time() - started, 1),
+                "from_cache": False,
+                "error": "could not read any Austin listings just now"}
+
     picks = verifier.verify_all(ranker.rank(swept["shows"], profile, meter=meter),
                                 meter=meter)
 
@@ -76,5 +97,7 @@ def get_picks(force: bool = False) -> dict:
         "from_cache": False,
         "error": "",
     }
-    _store(PICKS_CACHE, key, payload)
+    # Only a run that actually produced picks is worth remembering.
+    if picks:
+        _store(PICKS_CACHE, key, payload)
     return payload
