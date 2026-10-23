@@ -4,8 +4,20 @@
     {
       "name": "encore",
       "runtimeExecutable": ".venv/bin/python",
-      "runtimeArgs": ["app.py"],
+      "runtimeArgs": [
+        "app.py"
+      ],
       "port": 5000
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5090"
+      ],
+      "port": 5090
     }
   ]
 }
