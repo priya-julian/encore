@@ -1,0 +1,115 @@
+{
+  "model": "gpt-6-luna",
+  "rate_card_usd_per_1m": {
+    "input": 0.1,
+    "cached_input": 0.01,
+    "output": 0.5
+  },
+  "measured_at": "2026-10-23 15:36",
+  "runs_per_user_per_month": 8,
+  "cold": {
+    "seconds": 21.8,
+    "shows_considered": 459,
+    "picks": 5,
+    "tokens_in": 47192,
+    "tokens_out": 59724,
+    "model_calls": 72,
+    "cache_hits": 0,
+    "cost_usd": 0.034581,
+    "by_agent": {
+      "profiler": {
+        "prompt": 721,
+        "completion": 677,
+        "calls": 1
+      },
+      "showlist": {
+        "prompt": 25113,
+        "completion": 36214,
+        "calls": 43
+      },
+      "ranker-screen": {
+        "prompt": 14246,
+        "completion": 17742,
+        "calls": 9
+      },
+      "scholar": {
+        "prompt": 4141,
+        "completion": 2870,
+        "calls": 13
+      },
+      "ranker-final": {
+        "prompt": 1415,
+        "completion": 791,
+        "calls": 1
+      },
+      "verifier": {
+        "prompt": 1556,
+        "completion": 1430,
+        "calls": 5
+      }
+    }
+  },
+  "warm": {
+    "seconds": 1.7,
+    "shows_considered": 459,
+    "picks": 5,
+    "tokens_in": 17938,
+    "tokens_out": 20640,
+    "model_calls": 16,
+    "cache_hits": 56,
+    "cost_usd": 0.012114,
+    "by_agent": {
+      "profiler": {
+        "prompt": 721,
+        "completion": 677,
+        "calls": 1
+      },
+      "showlist": {
+        "prompt": 0,
+        "completion": 0,
+        "calls": 43
+      },
+      "ranker-screen": {
+        "prompt": 14246,
+        "completion": 17742,
+        "calls": 9
+      },
+      "scholar": {
+        "prompt": 0,
+        "completion": 0,
+        "calls": 13
+      },
+      "ranker-final": {
+        "prompt": 1415,
+        "completion": 791,
+        "calls": 1
+      },
+      "verifier": {
+        "prompt": 1556,
+        "completion": 1430,
+        "calls": 5
+      }
+    }
+  },
+  "shared_cost_usd": 0.022467,
+  "scale": {
+    "1": {
+      "users": 1,
+      "shared_monthly_usd": 0.67,
+      "per_user_monthly_usd": 0.0969,
+      "total_monthly_usd": 0.77
+    },
+    "100": {
+      "users": 100,
+      "shared_monthly_usd": 0.67,
+      "per_user_monthly_usd": 0.0969,
+      "total_monthly_usd": 10.37
+    },
+    "10000": {
+      "users": 10000,
+      "shared_monthly_usd": 0.67,
+      "per_user_monthly_usd": 0.0969,
+      "total_monthly_usd": 969.79
+    }
+  }
+}
