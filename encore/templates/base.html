@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encore — {{ page|capitalize }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('discover') }}">
+    <span class="mark">◗</span> Encore
+  </a>
+  <nav>
+    <a href="{{ url_for('discover') }}" class="{{ 'on' if page=='discover' }}">Discover</a>
+    <a href="{{ url_for('show_log') }}" class="{{ 'on' if page=='log' }}">My shows</a>
+    <a href="{{ url_for('taste') }}" class="{{ 'on' if page=='taste' }}">Taste</a>
+  </nav>
+</header>
+<main>{% block body %}{% endblock %}</main>
+<footer>
+  Listings from <a href="https://austin.showlists.net/">Showlist Austin</a> ·
+  <a href="{{ url_for('impact') }}">stats</a>
+</footer>
+</body>
+</html>

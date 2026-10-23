@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <h1>My shows</h1>
+  <p class="sub">{{ rows|length }} shows · this is what Encore reads your taste from.</p>
+</section>
+
+<details class="addbox">
+  <summary>Add a show</summary>
+  <form method="post" action="{{ url_for('add_show') }}" class="addform">
+    <input name="artist" placeholder="Artist" required>
+    <input name="date" placeholder="2024-05 (rough is fine)">
+    <input name="venue" placeholder="Venue">
+    <input name="openers" placeholder="Openers">
+    <select name="gut_rating">
+      <option value="loved">loved</option>
+      <option value="liked" selected>liked</option>
+      <option value="fine">fine</option>
+      <option value="meh">meh</option>
+    </select>
+    <input name="notes" placeholder="One line on why it landed — this is the best signal">
+    <button type="submit">Add</button>
+  </form>
+</details>
+
+<table class="log">
+  <thead><tr><th>Artist</th><th>When</th><th>Venue</th><th></th><th>Notes</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td class="strong">{{ r.artist }}{% if r.openers %}<span class="dim"> w/ {{ r.openers }}</span>{% endif %}</td>
+      <td class="dim">{{ r.date }}</td>
+      <td class="dim">{{ r.venue or '—' }}</td>
+      <td><span class="rating {{ r.gut_rating }}">{{ r.gut_rating }}</span></td>
+      <td class="dim">{{ r.notes }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p class="meterline">Source file: data/{{ source }}</p>
+{% endblock %}

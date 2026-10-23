@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <h1>Shows you'd regret missing</h1>
+  <p class="sub">Every Austin venue, read against your own concert history.</p>
+  <button id="refresh" class="ghost">Re-run</button>
+</section>
+
+<div id="status" class="status">
+  <span class="spinner"></span> Reading Austin listings…
+</div>
+
+<div id="picks" class="picks"></div>
+
+<template id="card-tpl">
+  <article class="card">
+    <div class="rank"></div>
+    <div class="card-body">
+      <h2 class="artist"></h2>
+      <p class="meta"></p>
+      <p class="why"></p>
+      <div class="badges"></div>
+      <div class="actions">
+        <button data-kind="new_to_me" class="chip">Didn't know this</button>
+        <button data-kind="save" class="chip">Save</button>
+        <button data-kind="not_for_me" class="chip subtle">Not for me</button>
+      </div>
+    </div>
+  </article>
+</template>
+
+<p id="meterline" class="meterline"></p>
+
+<script>
+const statusEl = document.getElementById('status');
+const picksEl  = document.getElementById('picks');
+const meterEl  = document.getElementById('meterline');
+
+function badge(text, cls) {
+  const b = document.createElement('span');
+  b.className = 'badge ' + cls;
+  b.textContent = text;
+  return b;
+}
+
+async function sendEvent(kind, artist, btn) {
+  btn.classList.add('done');
+  btn.disabled = true;
+  await fetch('/api/event', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({kind, artist})
+  });
+}
+
+function render(data) {
+  picksEl.innerHTML = '';
+  if (data.error) { statusEl.textContent = data.error; return; }
+  statusEl.style.display = 'none';
+
+  data.picks.forEach(p => {
+    const node = document.getElementById('card-tpl').content.cloneNode(true);
+    node.querySelector('.rank').textContent = p.rank;
+    node.querySelector('.artist').textContent = p.artist;
+    const bits = [p.date, p.venue || 'venue TBA'];
+    if (p.support) bits.push('with ' + p.support);
+    node.querySelector('.meta').textContent = bits.join(' · ');
+    node.querySelector('.why').textContent = p.why;
+
+    const badges = node.querySelector('.badges');
+    if (p.verified) badges.appendChild(badge('✓ details verified', 'ok'));
+    else badges.appendChild(badge('⚠ partly unverified', 'warn'));
+    badges.appendChild(badge(p.confidence + ' confidence', 'muted'));
+    if (p.research && p.research.hometown) {
+      // Source data can be very precise ("Blue Mountains region, New South
+      // Wales, Australia"); the city is the part a reader wants.
+      const where = p.research.hometown.split(',').slice(0, 2).join(',').trim();
+      badges.appendChild(badge(where, 'muted'));
+    }
+
+    node.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => sendEvent(btn.dataset.kind, p.artist, btn));
+    });
+    picksEl.appendChild(node);
+  });
+
+  const m = data.meter || {};
+  meterEl.textContent =
+    `${data.considered} shows considered · ${data.seconds}s · ` +
+    `$${(data.cost || 0).toFixed(4)} · ` +
+    `${m.calls || 0} model calls, ${m.cache_hits || 0} cache hits` +
+    (data.from_cache ? ' · served from cache' : '');
+}
+
+async function load(force) {
+  statusEl.style.display = '';
+  statusEl.innerHTML = '<span class="spinner"></span> ' +
+    (force ? 'Re-reading every Austin venue…' : 'Reading Austin listings…');
+  picksEl.innerHTML = '';
+  const res = await fetch('/api/picks' + (force ? '?force=1' : ''));
+  render(await res.json());
+}
+
+document.getElementById('refresh').addEventListener('click', () => load(true));
+load(false);
+</script>
+{% endblock %}

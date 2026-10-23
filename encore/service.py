@@ -1,0 +1,80 @@
+"""Caches a user's picks so the web app does not re-run agents on every load."""
+import hashlib
+import json
+import time
+
+from . import config, llm, log, pipeline, pricing
+from .agents import profiler, ranker, verifier
+
+PICKS_CACHE = config.CACHE_DIR / "picks"
+PROFILE_CACHE = config.CACHE_DIR / "profiles"
+TTL = 6 * 60 * 60
+
+
+def log_fingerprint(rows: list[dict]) -> str:
+    blob = json.dumps(rows, sort_keys=True)
+    return hashlib.sha256(blob.encode()).hexdigest()[:16]
+
+
+def _cached(folder, key: str, ttl: int = TTL):
+    path = folder / f"{key}.json"
+    if path.is_file() and time.time() - path.stat().st_mtime < ttl:
+        try:
+            return json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError):
+            return None
+    return None
+
+
+def _store(folder, key: str, payload):
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{key}.json").write_text(json.dumps(payload))
+
+
+def get_profile(rows: list[dict], meter: llm.Meter) -> dict:
+    key = log_fingerprint(rows)
+    hit = _cached(PROFILE_CACHE, key, ttl=30 * 24 * 60 * 60)
+    if hit is not None:
+        return hit
+    profile = profiler.build(rows, meter=meter)
+    _store(PROFILE_CACHE, key, profile)
+    return profile
+
+
+def get_picks(force: bool = False) -> dict:
+    """Profile -> sweep -> rank -> verify, cached on the log's fingerprint."""
+    rows = log.read()
+    meter = llm.Meter()
+    started = time.time()
+
+    if not rows:
+        return {"picks": [], "profile": {}, "error": "no shows in your log yet",
+                "meter": meter.totals(), "cost": 0.0, "seconds": 0.0}
+
+    key = log_fingerprint(rows)
+    if not force:
+        hit = _cached(PICKS_CACHE, key)
+        if hit is not None:
+            hit["from_cache"] = True
+            return hit
+
+    profile = get_profile(rows, meter)
+    swept = pipeline.sweep(meter=meter)
+    picks = verifier.verify_all(ranker.rank(swept["shows"], profile, meter=meter),
+                                meter=meter)
+
+    totals = meter.totals()
+    payload = {
+        "picks": picks,
+        "profile": profile,
+        "considered": len(swept["shows"]),
+        "injections": swept["injections"],
+        "meter": totals,
+        "cost": pricing.cost_usd(config.MODEL, totals["prompt_tokens"],
+                                 totals["completion_tokens"]),
+        "seconds": round(time.time() - started, 1),
+        "from_cache": False,
+        "error": "",
+    }
+    _store(PICKS_CACHE, key, payload)
+    return payload

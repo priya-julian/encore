@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <h1>Your taste</h1>
+  <p class="sub">What Encore thinks it learned. If this is wrong, the picks will be too.</p>
+</section>
+<div id="profile" class="status"><span class="spinner"></span> Reading your log…</div>
+<script>
+fetch('/api/profile').then(r => r.json()).then(p => {
+  const el = document.getElementById('profile');
+  if (p.error) { el.textContent = p.error; return; }
+  el.className = '';
+  const list = (items) => items.map(i => `<li>${i}</li>`).join('');
+  el.innerHTML = `
+    <blockquote class="summary">${p.summary}</blockquote>
+    <div class="cols">
+      <div class="col"><h3>Loves</h3><ul>${list(p.loves || [])}</ul></div>
+      <div class="col"><h3>Avoids</h3><ul>${list(p.avoids || [])}</ul></div>
+    </div>
+    <dl class="facts">
+      <dt>Venues</dt><dd>${p.venue_preference || ''}</dd>
+      <dt>Discovery</dt><dd>${p.discovery_appetite || ''}</dd>
+      <dt>Built from</dt><dd>${p.shows} shows · ${p.confidence} confidence</dd>
+    </dl>`;
+});
+</script>
+{% endblock %}

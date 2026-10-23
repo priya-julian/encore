@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <h1>Stats</h1>
+  <p class="sub">Anonymous usage, for the project write-up.</p>
+</section>
+<div class="tiles">
+  <div class="tile"><b>{{ stats.sessions }}</b><span>people</span></div>
+  <div class="tile"><b>{{ stats.runs }}</b><span>runs</span></div>
+  <div class="tile"><b>{{ stats.new_to_me }}</b><span>"didn't know this"</span></div>
+  <div class="tile"><b>{{ stats.saved }}</b><span>saved</span></div>
+</div>
+{% endblock %}
