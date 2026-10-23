@@ -5,21 +5,21 @@
     "cached_input": 0.01,
     "output": 0.5
   },
-  "measured_at": "2026-10-23 15:36",
+  "measured_at": "2026-10-23 16:08",
   "runs_per_user_per_month": 8,
   "cold": {
-    "seconds": 21.8,
+    "seconds": 19.2,
     "shows_considered": 459,
     "picks": 5,
-    "tokens_in": 47192,
-    "tokens_out": 59724,
+    "tokens_in": 47402,
+    "tokens_out": 58069,
     "model_calls": 72,
     "cache_hits": 0,
-    "cost_usd": 0.034581,
+    "cost_usd": 0.033775,
     "by_agent": {
       "profiler": {
-        "prompt": 721,
-        "completion": 677,
+        "prompt": 760,
+        "completion": 765,
         "calls": 1
       },
       "showlist": {
@@ -28,40 +28,40 @@
         "calls": 43
       },
       "ranker-screen": {
-        "prompt": 14246,
-        "completion": 17742,
+        "prompt": 14156,
+        "completion": 17013,
         "calls": 9
       },
       "scholar": {
-        "prompt": 4141,
-        "completion": 2870,
+        "prompt": 4557,
+        "completion": 2809,
         "calls": 13
       },
       "ranker-final": {
-        "prompt": 1415,
-        "completion": 791,
+        "prompt": 1362,
+        "completion": 644,
         "calls": 1
       },
       "verifier": {
-        "prompt": 1556,
-        "completion": 1430,
+        "prompt": 1454,
+        "completion": 624,
         "calls": 5
       }
     }
   },
   "warm": {
-    "seconds": 1.7,
+    "seconds": 1.9,
     "shows_considered": 459,
     "picks": 5,
-    "tokens_in": 17938,
-    "tokens_out": 20640,
+    "tokens_in": 17732,
+    "tokens_out": 19046,
     "model_calls": 16,
     "cache_hits": 56,
-    "cost_usd": 0.012114,
+    "cost_usd": 0.011296,
     "by_agent": {
       "profiler": {
-        "prompt": 721,
-        "completion": 677,
+        "prompt": 760,
+        "completion": 765,
         "calls": 1
       },
       "showlist": {
@@ -70,8 +70,8 @@
         "calls": 43
       },
       "ranker-screen": {
-        "prompt": 14246,
-        "completion": 17742,
+        "prompt": 14156,
+        "completion": 17013,
         "calls": 9
       },
       "scholar": {
@@ -80,36 +80,36 @@
         "calls": 13
       },
       "ranker-final": {
-        "prompt": 1415,
-        "completion": 791,
+        "prompt": 1362,
+        "completion": 644,
         "calls": 1
       },
       "verifier": {
-        "prompt": 1556,
-        "completion": 1430,
+        "prompt": 1454,
+        "completion": 624,
         "calls": 5
       }
     }
   },
-  "shared_cost_usd": 0.022467,
+  "shared_cost_usd": 0.022479,
   "scale": {
     "1": {
       "users": 1,
       "shared_monthly_usd": 0.67,
-      "per_user_monthly_usd": 0.0969,
-      "total_monthly_usd": 0.77
+      "per_user_monthly_usd": 0.0904,
+      "total_monthly_usd": 0.76
     },
     "100": {
       "users": 100,
       "shared_monthly_usd": 0.67,
-      "per_user_monthly_usd": 0.0969,
-      "total_monthly_usd": 10.37
+      "per_user_monthly_usd": 0.0904,
+      "total_monthly_usd": 9.71
     },
     "10000": {
       "users": 10000,
       "shared_monthly_usd": 0.67,
-      "per_user_monthly_usd": 0.0969,
-      "total_monthly_usd": 969.79
+      "per_user_monthly_usd": 0.0904,
+      "total_monthly_usd": 904.35
     }
   }
 }

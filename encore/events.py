@@ -24,11 +24,30 @@ def record(kind: str, session: str = "", **data):
         pass
 
 
-def load() -> list[dict]:
-    if not EVENTS_PATH.is_file():
+LIVE_PATH = config.DATA_DIR / "events_live.jsonl"
+BASELINE_PATH = config.DATA_DIR / "events_baseline.json"
+
+
+def baseline_ts() -> float:
+    """Timestamp before which events are developer testing, not real usage.
+
+    Every curl against the deployed app creates a fresh session, so without
+    this the impact numbers would quietly count my own smoke tests as users.
+    """
+    if not BASELINE_PATH.is_file():
+        return 0.0
+    try:
+        return float(json.loads(BASELINE_PATH.read_text()).get("ts", 0))
+    except (json.JSONDecodeError, OSError, TypeError, ValueError):
+        return 0.0
+
+
+def load(path: Path | None = None) -> list[dict]:
+    path = path or EVENTS_PATH
+    if not path.is_file():
         return []
     rows = []
-    for line in EVENTS_PATH.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         try:
             rows.append(json.loads(line))
         except json.JSONDecodeError:
@@ -36,8 +55,35 @@ def load() -> list[dict]:
     return rows
 
 
-def summary() -> dict:
-    rows = load()
+def rejected_artists(limit: int = 40) -> list[str]:
+    """Artists the user marked 'not for me', newest first.
+
+    This is the one signal the show log cannot provide: the log says what you
+    chose to attend, never what you were offered and turned down.
+    """
+    seen: list[str] = []
+    for row in reversed(load()):
+        if row.get("kind") != "not_for_me":
+            continue
+        artist = (row.get("artist") or "").strip()
+        if artist and artist not in seen:
+            seen.append(artist)
+        if len(seen) >= limit:
+            break
+    return seen
+
+
+def summary(path: Path | None = None) -> dict:
+    """Usage summary.
+
+    Defaults to this machine's events. The report passes the file pulled
+    from the deployed app instead, so local development never inflates the
+    numbers reported as real usage.
+    """
+    rows = load(path)
+    if path is not None:
+        cutoff = baseline_ts()
+        rows = [r for r in rows if r.get("ts", 0) > cutoff]
     sessions = {r["session"] for r in rows if r.get("session")}
     kinds: dict = {}
     for r in rows:

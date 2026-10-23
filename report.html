@@ -250,30 +250,30 @@ to a local band in the log.</p>
 
 <p>Every model call in the app passes through one metered wrapper that records
 prompt tokens, completion tokens and latency per agent. The numbers below were
-measured by <code>scripts/benchmark.py</code> on 2026-10-23 15:36, which
+measured by <code>scripts/benchmark.py</code> on 2026-10-23 16:08, which
 clears the cache, runs a genuinely cold pipeline, then a warm one. Prices are
 the course rate card for gpt-6-luna: $0.10 per 1M input
 tokens, $0.01 cached, $0.50 output.</p>
 
 <div class="kpis">
-  <div class="kpi"><b>$0.0346</b><span>cold run</span></div>
-  <div class="kpi"><b>$0.0121</b><span>warm run</span></div>
-  <div class="kpi"><b>21.8s</b><span>cold latency</span></div>
-  <div class="kpi"><b>1.7s</b><span>warm latency</span></div>
+  <div class="kpi"><b>$0.0338</b><span>cold run</span></div>
+  <div class="kpi"><b>$0.0113</b><span>warm run</span></div>
+  <div class="kpi"><b>19.2s</b><span>cold latency</span></div>
+  <div class="kpi"><b>1.9s</b><span>warm latency</span></div>
 </div>
 
 <table>
 <tr><th>Agent</th><th class="n">Calls</th><th class="n">Cold tokens</th>
 <th class="n">Warm tokens</th></tr>
 <tr><td><b>Scout</b><br><span class='s'>Parse listings into structured shows</span></td><td class='n'>43</td><td class='n'>61,327</td><td class='n'>0</td></tr>
-<tr><td><b>Profiler</b><br><span class='s'>Build the taste profile from the log</span></td><td class='n'>1</td><td class='n'>1,398</td><td class='n'>1,398</td></tr>
-<tr><td><b>Ranker (screen)</b><br><span class='s'>Score every show cheaply</span></td><td class='n'>9</td><td class='n'>31,988</td><td class='n'>31,988</td></tr>
-<tr><td><b>Scholar</b><br><span class='s'>Research unfamiliar artists</span></td><td class='n'>13</td><td class='n'>7,011</td><td class='n'>0</td></tr>
-<tr><td><b>Ranker (final)</b><br><span class='s'>Rank finalists and write reasons</span></td><td class='n'>1</td><td class='n'>2,206</td><td class='n'>2,206</td></tr>
-<tr><td><b>Verifier</b><br><span class='s'>Fact-check every pick</span></td><td class='n'>5</td><td class='n'>2,986</td><td class='n'>2,986</td></tr>
+<tr><td><b>Profiler</b><br><span class='s'>Build the taste profile from the log</span></td><td class='n'>1</td><td class='n'>1,525</td><td class='n'>1,525</td></tr>
+<tr><td><b>Ranker (screen)</b><br><span class='s'>Score every show cheaply</span></td><td class='n'>9</td><td class='n'>31,169</td><td class='n'>31,169</td></tr>
+<tr><td><b>Scholar</b><br><span class='s'>Research unfamiliar artists</span></td><td class='n'>13</td><td class='n'>7,366</td><td class='n'>0</td></tr>
+<tr><td><b>Ranker (final)</b><br><span class='s'>Rank finalists and write reasons</span></td><td class='n'>1</td><td class='n'>2,006</td><td class='n'>2,006</td></tr>
+<tr><td><b>Verifier</b><br><span class='s'>Fact-check every pick</span></td><td class='n'>5</td><td class='n'>2,078</td><td class='n'>2,078</td></tr>
 <tr><td><b>Total</b></td><td class="n">72</td>
-<td class="n">106,916</td>
-<td class="n">38,578</td></tr>
+<td class="n">105,471</td>
+<td class="n">36,778</td></tr>
 </table>
 
 <h3>Where the money goes, and what was done about it</h3>
@@ -291,14 +291,14 @@ entirely.</li>
 cost by roughly 33&times; and produce the same five picks.</li>
 <li><b>Tiered caching.</b> Listings and artist research are cached to disk;
 near-term days expire after 12 hours because shows sell out, far-out days
-after a week because they do not. The warm run costs <b>65% less</b>
-than the cold run and is <b>13&times; faster</b>.</li>
+after a week because they do not. The warm run costs <b>67% less</b>
+than the cold run and is <b>10&times; faster</b>.</li>
 </ul>
 
 <p>The remaining warm cost is almost entirely the screening pass, which is
 inherently per-user: it scores the city against <i>your</i> profile. At the
 application level even that is cached against a fingerprint of the log, so
-revisiting the page costs nothing; $0.0121 is the price of a
+revisiting the page costs nothing; $0.0113 is the price of a
 fresh ranking after the log changes.</p>
 
 <h3>Cost at scale</h3>
@@ -312,14 +312,14 @@ user per month and one shared sweep per day:</p>
 <tr><th>Users</th><th class="n">Shared / month</th>
 <th class="n">Per user / month</th><th class="n">Total / month</th></tr>
 <tr><td>1</td><td class="n">$0.6700</td>
-<td class="n">$0.0969</td>
-<td class="n">$0.7700</td></tr>
+<td class="n">$0.0904</td>
+<td class="n">$0.7600</td></tr>
 <tr><td>100</td><td class="n">$0.6700</td>
-<td class="n">$0.0969</td>
-<td class="n">$10.37</td></tr>
+<td class="n">$0.0904</td>
+<td class="n">$9.71</td></tr>
 <tr><td>10,000</td><td class="n">$0.6700</td>
-<td class="n">$0.0969</td>
-<td class="n">$969.79</td></tr>
+<td class="n">$0.0904</td>
+<td class="n">$904.35</td></tr>
 </table>
 
 <p>Roughly <b>ten cents per user per month</b> at scale, which a single
@@ -423,9 +423,9 @@ listing source, which is published to be read.</p>
 <h2>6. Impact</h2>
 
 <div class="kpis">
-  <div class="kpi"><b>3</b><span>people</span></div>
-  <div class="kpi"><b>5</b><span>runs</span></div>
-  <div class="kpi"><b>1</b><span>"didn't know this"</span></div>
+  <div class="kpi"><b>0</b><span>people</span></div>
+  <div class="kpi"><b>0</b><span>runs</span></div>
+  <div class="kpi"><b>0</b><span>"didn't know this"</span></div>
   <div class="kpi"><b>0</b><span>shows saved</span></div>
 </div>
 

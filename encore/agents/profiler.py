@@ -31,10 +31,13 @@ Return JSON:
 - "confidence": "low", "medium" or "high", based on how many shows and how
   much variety the log has. Say low if the log is thin.
 - Never invent an artist that is not in the log.
+- Turned-down recommendations are real negative signal, but they are weaker
+  than a show they actually attended and rated. Do not let one rejection
+  outweigh the pattern of the log.
 """
 
 
-def build(rows: list[dict], meter=None) -> dict:
+def build(rows: list[dict], rejected: list[str] | None = None, meter=None) -> dict:
     if not rows:
         return {"summary": "", "loves": [], "avoids": [], "venue_preference": "",
                 "discovery_appetite": "", "confidence": "low", "shows": 0}
@@ -57,6 +60,13 @@ def build(rows: list[dict], meter=None) -> dict:
         f"FINE ({len(tiers.get('fine') or [])} shows):\n{fmt('fine')}\n\n"
         f"MEH ({len(tiers.get('meh') or [])} shows):\n{fmt('meh')}"
     )
+    if rejected:
+        user += (
+            "\n\nRECOMMENDATIONS THEY TURNED DOWN (they were offered these "
+            "upcoming shows and said 'not for me'; weigh this as negative "
+            "signal alongside the MEH list):\n"
+            + "\n".join(f"- {a}" for a in rejected)
+        )
     try:
         profile = json.loads(llm.complete("profiler", SYSTEM, user, meter=meter,
                                           json_mode=True))

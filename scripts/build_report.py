@@ -45,8 +45,15 @@ def load_tokenomics() -> dict:
 
 
 def load_impact() -> dict:
+    """Usage from the deployed app, falling back to local events.
+
+    Prefers data/events_live.jsonl (pulled by scripts/fetch_events.py) so
+    that development on this machine never counts as real user activity.
+    """
     from encore import events
 
+    if events.LIVE_PATH.is_file():
+        return events.summary(events.LIVE_PATH)
     return events.summary()
 
 

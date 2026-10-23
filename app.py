@@ -89,10 +89,13 @@ def taste():
 @app.route("/api/profile")
 def api_profile():
     from encore import llm
+    from encore import events as ev
+
     rows = log.read()
     if not rows:
         return jsonify({"error": "no shows in your log yet"})
-    return jsonify(service.get_profile(rows, llm.Meter()))
+    return jsonify(service.get_profile(rows, llm.Meter(),
+                                       rejected=ev.rejected_artists()))
 
 
 @app.route("/api/events.jsonl")

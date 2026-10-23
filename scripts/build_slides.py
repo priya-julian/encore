@@ -31,7 +31,8 @@ def build() -> str:
     t = json.loads((ROOT / "data" / "tokenomics.json").read_text())
     from encore import events
 
-    impact = events.summary()
+    impact = (events.summary(events.LIVE_PATH)
+              if events.LIVE_PATH.is_file() else events.summary())
 
     cold, warm, scale = t["cold"], t["warm"], t["scale"]
     reveal_css = (VENDOR / "reveal.css").read_text()

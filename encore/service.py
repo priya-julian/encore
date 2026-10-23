@@ -3,7 +3,7 @@ import hashlib
 import json
 import time
 
-from . import config, llm, log, pipeline, pricing
+from . import config, events, llm, log, pipeline, pricing
 from .agents import profiler, ranker, verifier
 
 PICKS_CACHE = config.CACHE_DIR / "picks"
@@ -11,8 +11,14 @@ PROFILE_CACHE = config.CACHE_DIR / "profiles"
 TTL = 6 * 60 * 60
 
 
-def log_fingerprint(rows: list[dict]) -> str:
-    blob = json.dumps(rows, sort_keys=True)
+def log_fingerprint(rows: list[dict], rejected: list[str] | None = None) -> str:
+    """Identity of the inputs a profile and its picks depend on.
+
+    Rejections are part of the key: saying 'not for me' should invalidate the
+    cached picks, or the feedback would appear to do nothing.
+    """
+    blob = json.dumps({"rows": rows, "rejected": sorted(rejected or [])},
+                      sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
@@ -31,12 +37,13 @@ def _store(folder, key: str, payload):
     (folder / f"{key}.json").write_text(json.dumps(payload))
 
 
-def get_profile(rows: list[dict], meter: llm.Meter) -> dict:
-    key = log_fingerprint(rows)
+def get_profile(rows: list[dict], meter: llm.Meter,
+                rejected: list[str] | None = None) -> dict:
+    key = log_fingerprint(rows, rejected)
     hit = _cached(PROFILE_CACHE, key, ttl=30 * 24 * 60 * 60)
     if hit is not None:
         return hit
-    profile = profiler.build(rows, meter=meter)
+    profile = profiler.build(rows, rejected=rejected, meter=meter)
     # Never cache a failed profile: a missing key or a transient API error
     # would otherwise be frozen in for the life of the cache.
     if profile.get("summary"):
@@ -47,6 +54,7 @@ def get_profile(rows: list[dict], meter: llm.Meter) -> dict:
 def get_picks(force: bool = False) -> dict:
     """Profile -> sweep -> rank -> verify, cached on the log's fingerprint."""
     rows = log.read()
+    rejected = events.rejected_artists()
     meter = llm.Meter()
     started = time.time()
 
@@ -54,14 +62,14 @@ def get_picks(force: bool = False) -> dict:
         return {"picks": [], "profile": {}, "error": "no shows in your log yet",
                 "meter": meter.totals(), "cost": 0.0, "seconds": 0.0}
 
-    key = log_fingerprint(rows)
+    key = log_fingerprint(rows, rejected)
     if not force:
         hit = _cached(PICKS_CACHE, key)
         if hit is not None:
             hit["from_cache"] = True
             return hit
 
-    profile = get_profile(rows, meter)
+    profile = get_profile(rows, meter, rejected=rejected)
     if not profile.get("summary"):
         reason = profile.get("error", "")
         detail = ("the app could not reach the model — check that "
@@ -74,6 +82,10 @@ def get_picks(force: bool = False) -> dict:
                 "from_cache": False, "error": detail}
 
     swept = pipeline.sweep(meter=meter)
+    # Never offer back something already turned down.
+    turned_down = {a.lower() for a in rejected}
+    swept["shows"] = [s for s in swept["shows"]
+                      if s.get("artist", "").lower() not in turned_down]
     if not swept["shows"]:
         return {"picks": [], "profile": profile, "considered": 0,
                 "injections": [], "meter": meter.totals(), "cost": 0.0,

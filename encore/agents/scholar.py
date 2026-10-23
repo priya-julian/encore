@@ -125,11 +125,40 @@ def _bandcamp(artist: str, city_hint: str = "Austin") -> str:
     parts = [f"Bandcamp match: {hit.get('name', '')}"]
     if hit.get("location"):
         parts.append(f"based in {hit['location']}")
-    if hit.get("genre_name"):
+    # tag_names is far richer than the single genre_name field: a band can be
+    # "rock, Experimental, indie rock, artpop, DIY" rather than just one word.
+    tags = [t for t in (hit.get("tag_names") or []) if t]
+    if tags:
+        parts.append("tags: " + ", ".join(tags[:6]))
+    elif hit.get("genre_name"):
         parts.append(f"genre: {hit['genre_name']}")
+    bio = _bandcamp_bio(hit.get("item_url_root") or "")
+    if bio:
+        parts.append(f"self-description: {bio}")
     if len(exact) > 1 and not local:
         parts.append("(several bands share this name -- match is uncertain)")
     return " | ".join(parts)
+
+
+def _bandcamp_bio(root: str) -> str:
+    """The artist's own words, which is the best source for a small band."""
+    if not root.startswith("https://") or not root.endswith(".bandcamp.com"):
+        return ""
+    try:
+        resp = requests.get(root + "/music", headers={"User-Agent": MB_AGENT},
+                            timeout=12)
+        if resp.status_code != 200:
+            return ""
+    except requests.RequestException:
+        return ""
+    soup = BeautifulSoup(resp.text, "html.parser")
+    node = soup.select_one("#bio-text")
+    if node is None:
+        meta = soup.select_one('meta[name="description"]')
+        text = (meta.get("content") or "") if meta else ""
+    else:
+        text = node.get_text(" ", strip=True)
+    return re.sub(r"\s+", " ", text).strip()[:600]
 
 
 def _wikipedia(artist: str) -> str:
