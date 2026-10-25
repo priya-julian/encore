@@ -33,7 +33,7 @@ def discover():
 def api_picks():
     force = request.args.get("force") == "1"
     with _run_lock:
-        result = service.get_picks(force=force)
+        result = service.get_picks(force=force, session=sid())
     if not result.get("error"):
         events.record("run", sid(), count=len(result["picks"]),
                       considered=result.get("considered", 0),
@@ -54,30 +54,51 @@ def api_event():
 
 @app.route("/log")
 def show_log():
-    rows = log.read()
+    session_id = sid()
+    rows = log.read(session=session_id)
     order = {"loved": 0, "liked": 1, "fine": 2, "meh": 3}
     rows.sort(key=lambda r: (order.get(r["gut_rating"], 9), r["artist"].lower()))
     return render_template("log.html", page="log", rows=rows,
-                           source=log.log_path().name)
+                           own=log.is_own_log(session_id))
 
 
 @app.route("/log/add", methods=["POST"])
 def add_show():
-    rows = log.read(config.DATA_DIR / "concert_log.csv")
-    form = request.form
-    artist = (form.get("artist") or "").strip()
+    session_id = sid()
+    artist = (request.form.get("artist") or "").strip()
     if artist:
-        rows.append({
+        log.add(session_id, {
             "artist": artist,
-            "date": (form.get("date") or "").strip(),
-            "venue": (form.get("venue") or "").strip(),
-            "city": (form.get("city") or "Austin TX").strip(),
-            "openers": (form.get("openers") or "").strip(),
-            "gut_rating": (form.get("gut_rating") or "liked").strip(),
-            "notes": (form.get("notes") or "").strip(),
+            "date": request.form.get("date", ""),
+            "venue": request.form.get("venue", ""),
+            "city": request.form.get("city") or "Austin TX",
+            "openers": request.form.get("openers", ""),
+            "gut_rating": request.form.get("gut_rating") or "liked",
+            "notes": request.form.get("notes", ""),
         })
-        log.write(rows)
-        events.record("add_show", sid(), artist=artist[:80])
+        events.record("add_show", session_id, artist=artist[:80])
+    return redirect(url_for("show_log"))
+
+
+@app.route("/log/bulk", methods=["POST"])
+def add_bulk():
+    """Paste a list of shows, one per line. Far less friction than a form."""
+    session_id = sid()
+    parsed = log.parse_bulk(request.form.get("bulk") or "")
+    if parsed:
+        existing = log.read(log.user_path(session_id))
+        log.write(existing + parsed, session=session_id)
+        events.record("add_bulk", session_id, count=len(parsed))
+    return redirect(url_for("show_log"))
+
+
+@app.route("/log/reset", methods=["POST"])
+def reset_log():
+    """Start over with an empty log of your own."""
+    session_id = sid()
+    path = log.user_path(session_id)
+    if path.is_file():
+        path.unlink()
     return redirect(url_for("show_log"))
 
 
@@ -89,13 +110,13 @@ def taste():
 @app.route("/api/profile")
 def api_profile():
     from encore import llm
-    from encore import events as ev
 
-    rows = log.read()
+    session_id = sid()
+    rows = log.read(session=session_id)
     if not rows:
         return jsonify({"error": "no shows in your log yet"})
-    return jsonify(service.get_profile(rows, llm.Meter(),
-                                       rejected=ev.rejected_artists()))
+    return jsonify(service.get_profile(
+        rows, llm.Meter(), rejected=events.rejected_artists(session_id)))
 
 
 @app.route("/api/events.jsonl")

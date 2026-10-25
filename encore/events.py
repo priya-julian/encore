@@ -55,7 +55,7 @@ def load(path: Path | None = None) -> list[dict]:
     return rows
 
 
-def rejected_artists(limit: int = 40) -> list[str]:
+def rejected_artists(session: str = "", limit: int = 40) -> list[str]:
     """Artists the user marked 'not for me', newest first.
 
     This is the one signal the show log cannot provide: the log says what you
@@ -64,6 +64,8 @@ def rejected_artists(limit: int = 40) -> list[str]:
     seen: list[str] = []
     for row in reversed(load()):
         if row.get("kind") != "not_for_me":
+            continue
+        if session and row.get("session") != session[:12]:
             continue
         artist = (row.get("artist") or "").strip()
         if artist and artist not in seen:

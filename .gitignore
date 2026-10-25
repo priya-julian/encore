@@ -6,5 +6,6 @@ __pycache__/
 cache/
 data/events.jsonl
 data/events_devlocal.jsonl
+data/logs/
 server.log
 venv/

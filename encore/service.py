@@ -51,10 +51,14 @@ def get_profile(rows: list[dict], meter: llm.Meter,
     return profile
 
 
-def get_picks(force: bool = False) -> dict:
-    """Profile -> sweep -> rank -> verify, cached on the log's fingerprint."""
-    rows = log.read()
-    rejected = events.rejected_artists()
+def get_picks(force: bool = False, session: str = "") -> dict:
+    """Profile -> sweep -> rank -> verify, cached on the log's fingerprint.
+
+    Caches are keyed by log content, not by session, so two users with the
+    same shows share a cached result rather than paying twice.
+    """
+    rows = log.read(session=session)
+    rejected = events.rejected_artists(session)
     meter = llm.Meter()
     started = time.time()
 
