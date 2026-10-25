@@ -598,21 +598,46 @@ individually; only the aggregate counts in the next section were.</p>
 <h2>6. Impact</h2>
 
 <div class="kpis">
-  <div class="kpi"><b>{impact["sessions"]}</b><span>people</span></div>
-  <div class="kpi"><b>{impact["runs"]}</b><span>runs</span></div>
-  <div class="kpi"><b>{impact["new_to_me"]}</b><span>"didn't know this"</span></div>
-  <div class="kpi"><b>{impact["saved"]}</b><span>shows saved</span></div>
+  <div class="kpi"><b>{impact["sessions"]}</b><span>people used it</span></div>
+  <div class="kpi"><b>{impact["pct_found_new"]}%</b><span>found a show they
+    didn't know about</span></div>
+  <div class="kpi"><b>{impact["shows_surfaced"]}</b><span>shows recommended</span></div>
+  <div class="kpi"><b>{impact["runs_per_user"]}</b><span>runs per person</span></div>
 </div>
 
-<p>The app records four anonymous events: a run, a "didn't know this" click, a
-save, and a "not for me". There is no identifying data beyond a random session
-id. The numbers above are read directly from the deployed app's event log at
-build time.</p>
+<table>
+<tr><th>Measure</th><th class="n">Value</th><th>How it is counted</th></tr>
+<tr><td>People who used it</td><td class="n">{impact["sessions"]}</td>
+<td>Distinct visitors who ran Encore or entered shows &mdash; a page load
+alone does not count</td></tr>
+<tr><td>Built their own log</td><td class="n">{impact["built_own_log"]}</td>
+<td>Entered at least one concert of their own rather than loading the
+demo</td></tr>
+<tr><td>Discovery runs</td><td class="n">{impact["runs"]}</td>
+<td>Completed pipeline runs, {impact["runs_per_user"]} per person</td></tr>
+<tr><td>Shows recommended</td><td class="n">{impact["shows_surfaced"]}</td>
+<td>Picks shown across all runs</td></tr>
+<tr><td>"Didn't know this" clicks</td><td class="n">{impact["new_to_me"]}</td>
+<td>From {impact["users_found_new"]} people &mdash;
+{impact["pct_found_new"]}% of users</td></tr>
+<tr><td>Shows saved</td><td class="n">{impact["saved"]}</td>
+<td>From {impact["users_saved"]} people &mdash; {impact["pct_saved"]}% of
+users</td></tr>
+<tr><td>"Not for me"</td><td class="n">{impact["not_for_me"]}</td>
+<td>Rejections, which feed back into the taste profile</td></tr>
+</table>
 
-<p class="todo">To be completed once the testing round closes: percentage of
-users who found at least one show they did not know about, number of saves per
-user, and any tickets bought. Regenerate with
-<code>python scripts/build_report.py</code>.</p>
+<p>The app records five anonymous events: a run, a "didn't know this" click, a
+save, a "not for me", and adding shows. There is no identifying data beyond a
+random session id. These numbers are read from the deployed app's event log at
+build time, with a baseline timestamp excluding development testing, so
+nothing here counts the author.</p>
+
+<p><b>The headline measure is "didn't know this."</b> Encore's claim is not
+that it finds good shows &mdash; a list of every Austin gig does that &mdash;
+but that it finds shows a particular person would have missed. That click is
+the only honest test of it, which is why it is the one thing testers were
+asked to do.</p>
 
 <h3>Evidence so far</h3>
 

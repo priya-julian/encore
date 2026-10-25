@@ -76,7 +76,7 @@ def rejected_artists(session: str = "", limit: int = 40) -> list[str]:
 
 
 def summary(path: Path | None = None) -> dict:
-    """Usage summary.
+    """Usage summary, with the per-user rates the write-up needs.
 
     Defaults to this machine's events. The report passes the file pulled
     from the deployed app instead, so local development never inflates the
@@ -86,18 +86,40 @@ def summary(path: Path | None = None) -> dict:
     if path is not None:
         cutoff = baseline_ts()
         rows = [r for r in rows if r.get("ts", 0) > cutoff]
-    sessions = {r["session"] for r in rows if r.get("session")}
+
     kinds: dict = {}
-    for r in rows:
-        kinds[r["kind"]] = kinds.get(r["kind"], 0) + 1
+    per_session: dict = {}
+    for row in rows:
+        kind = row.get("kind", "")
+        kinds[kind] = kinds.get(kind, 0) + 1
+        session = row.get("session")
+        if session:
+            per_session.setdefault(session, set()).add(kind)
+
+    # Someone who only loaded the page is not a user of the thing.
+    engaged = {s for s, ks in per_session.items()
+               if ks & {"run", "add_bulk", "add_show", "load_demo"}}
+    found_new = {s for s, ks in per_session.items() if "new_to_me" in ks}
+    saved = {s for s, ks in per_session.items() if "save" in ks}
+    built = {s for s, ks in per_session.items() if ks & {"add_bulk", "add_show"}}
+
+    def pct(part: set) -> float:
+        return round(100 * len(part) / len(engaged), 1) if engaged else 0.0
+
     runs = kinds.get("run", 0)
-    new_to_me = kinds.get("new_to_me", 0)
     return {
-        "sessions": len(sessions),
+        "sessions": len(engaged),
+        "built_own_log": len(built),
         "runs": runs,
+        "runs_per_user": round(runs / len(engaged), 1) if engaged else 0.0,
         "shows_surfaced": sum(r.get("count", 0) for r in rows if r["kind"] == "run"),
-        "new_to_me": new_to_me,
+        "new_to_me": kinds.get("new_to_me", 0),
+        "users_found_new": len(found_new),
+        "pct_found_new": pct(found_new),
         "saved": kinds.get("save", 0),
+        "users_saved": len(saved),
+        "pct_saved": pct(saved),
+        "not_for_me": kinds.get("not_for_me", 0),
         "ticket_clicks": kinds.get("ticket_click", 0),
         "by_kind": kinds,
     }
