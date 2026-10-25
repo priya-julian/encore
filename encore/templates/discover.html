@@ -82,6 +82,7 @@ function showEmpty(message) {
 }
 
 function render(data) {
+  stopStages();
   picksEl.innerHTML = '';
   if (data.error) {
     if (/log/i.test(data.error)) {
@@ -140,15 +141,51 @@ function render(data) {
     (data.from_cache ? ' · served from cache' : '');
 }
 
+// A first run reads every Austin listing against a new taste profile and
+// takes around a minute. Saying what is happening, and roughly how long it
+// takes, is the difference between waiting and giving up.
+const STAGES = [
+  [0,  'Reading every Austin listing…'],
+  [8,  'Working out what you&rsquo;re into…'],
+  [18, 'Scoring ~460 upcoming shows against your taste…'],
+  [34, 'Researching the artists that made the shortlist…'],
+  [48, 'Fact-checking the picks…'],
+  [62, 'Almost there — first run takes about a minute.'],
+];
+let stageTimer = null;
+
+function startStages() {
+  const began = Date.now();
+  const tick = () => {
+    const secs = (Date.now() - began) / 1000;
+    let label = STAGES[0][1];
+    for (const [at, text] of STAGES) if (secs >= at) label = text;
+    statusEl.innerHTML = `<span class="spinner"></span> ${label}`;
+  };
+  tick();
+  stageTimer = setInterval(tick, 1000);
+}
+
+function stopStages() {
+  if (stageTimer) { clearInterval(stageTimer); stageTimer = null; }
+}
+
 async function load(force) {
   statusEl.style.display = '';
   statusEl.className = 'status';
-  statusEl.innerHTML = '<span class="spinner"></span> ' +
-    (force ? 'Re-reading every Austin venue…' : 'Reading Austin listings…');
   picksEl.innerHTML = '';
   meterEl.textContent = '';
-  const res = await fetch('/api/picks' + (force ? '?force=1' : ''));
-  render(await res.json());
+  startStages();
+  try {
+    const res = await fetch('/api/picks' + (force ? '?force=1' : ''));
+    render(await res.json());
+  } catch (err) {
+    statusEl.className = 'status error';
+    statusEl.innerHTML = '<b>Could not load picks.</b> '
+      + 'The connection dropped — try reloading.';
+  } finally {
+    stopStages();
+  }
 }
 
 document.getElementById('refresh').addEventListener('click', () => load(true));
