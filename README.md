@@ -24,21 +24,43 @@ On macOS, port 5000 is often taken by the AirPlay Receiver. If the app will
 not start, either turn that off in System Settings > General > AirDrop &
 Handoff, or run `PORT=5001 python app.py` and use <http://localhost:5001>.
 
-## Data
+## Data and how to switch datasets
 
-- `data/concert_log.csv` — your own shows. Encore uses this as soon as it has
-  rows.
-- `data/sample_log.csv` — a 27-show sample, used when your log is empty, so
-  the app works on a fresh clone.
+Encore ships with two small datasets so it works immediately on a fresh
+clone, and every log is a plain CSV with the same columns:
 
-Columns: `artist, date, venue, city, openers, gut_rating, notes`. Dates can be
-rough (`2024-05`, `2022 fall`). `gut_rating` is `loved`, `liked`, `fine` or
-`meh`. The `notes` column is the strongest taste signal — one line on why a
-show landed is worth more than a precise date.
+| File | What it is |
+|---|---|
+| `data/concert_log.csv` | 31 real Austin concerts. This is the **demo log**, loaded by the "Load the demo log" button on the My shows screen. |
+| `data/sample_log.csv` | A 27-show sample, used as a fallback if the demo log is missing. |
+| `data/logs/<id>.csv` | Written automatically, one per visitor. Not in the repo. |
 
-To use a different city, replace the venue metadata in `encore/venues.py` and
-point `encore/agents/showlist.py` at that city's listing source. Nothing else
-in the app is Austin-specific.
+Columns: `artist, date, venue, city, openers, gut_rating, notes`.
+Dates can be rough — `2024-05`, `2022 fall`, or blank. `gut_rating` is
+`loved`, `liked`, `fine` or `meh` (defaults to `liked`). `notes` is the
+strongest taste signal: one line on why a show landed is worth more than a
+precise date.
+
+**To use your own data**, pick whichever is easier:
+
+1. **In the app** — go to My shows and paste bands you've seen, one per line,
+   with an optional `- loved` / `- meh`. This writes `data/logs/<id>.csv` and
+   leaves the shipped files alone.
+2. **Replace the demo log** — overwrite `data/concert_log.csv` with your own
+   CSV, keeping the header row and column names. The "Load the demo log"
+   button then loads yours.
+3. **Point at a different file** — the paths are the three constants at the
+   top of `encore/log.py` (`USER_LOGS`, `OWNER_LOG`, `SAMPLE_LOG`). Change
+   `OWNER_LOG` to read a CSV from anywhere.
+
+A larger dataset needs no code change — the Profiler reads whatever rows the
+CSV has. Logs beyond a few hundred shows will cost more per profile run, and
+the profile is cached on a hash of the log, so it is rebuilt only when the
+file changes.
+
+**To use a different city**, replace the venue metadata in
+`encore/venues.py` and point `encore/agents/showlist.py` at that city's
+listing source. Nothing else in the app is Austin-specific.
 
 ## Safety demos
 

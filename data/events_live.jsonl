@@ -1,3 +1,15 @@
 {"ts": 1792785439.8, "kind": "run", "session": "e99e85193a32", "count": 5, "considered": 459, "cached": true, "cost": 0.03464}
 {"ts": 1792785465.7, "kind": "run", "session": "e99e85193a32", "count": 5, "considered": 459, "cached": true, "cost": 0.03464}
 {"ts": 1792785841.0, "kind": "run", "session": "7e80f74473f7", "count": 5, "considered": 459, "cached": true, "cost": 0.03464}
+{"ts": 1792970119.2, "kind": "add_bulk", "session": "9b8c94d501c3", "count": 5}
+{"ts": 1792970182.4, "kind": "run", "session": "9b8c94d501c3", "count": 5, "considered": 463, "cached": false, "cost": 0.0123}
+{"ts": 1792970182.4, "kind": "add_bulk", "session": "380a0c13603e", "count": 6}
+{"ts": 1792970182.4, "kind": "run", "session": "9b8c94d501c3", "count": 5, "considered": 463, "cached": true, "cost": 0.0123}
+{"ts": 1792970182.4, "kind": "run", "session": "9b8c94d501c3", "count": 5, "considered": 463, "cached": true, "cost": 0.0123}
+{"ts": 1792970193.8, "kind": "new_to_me", "session": "9b8c94d501c3", "artist": "Taylor Bickett"}
+{"ts": 1792970228.5, "kind": "save", "session": "9b8c94d501c3", "artist": "Lyle Lovett and his Small Large Band"}
+{"ts": 1792970238.2, "kind": "new_to_me", "session": "9b8c94d501c3", "artist": "almost monday"}
+{"ts": 1792970250.0, "kind": "new_to_me", "session": "9b8c94d501c3", "artist": "Ty Myers"}
+{"ts": 1792970262.9, "kind": "add_bulk", "session": "00051517e857", "count": 6}
+{"ts": 1792970313.7, "kind": "run", "session": "00051517e857", "count": 5, "considered": 463, "cached": false, "cost": 0.01188}
+{"ts": 1792970313.7, "kind": "save", "session": "9b8c94d501c3", "artist": "Teddy Swims"}
