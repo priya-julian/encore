@@ -158,3 +158,15 @@ table.log td{padding:11px 14px;border-top:1px solid var(--line)}
 .tile span{color:#9a8cb0;font-size:12.5px}
 
 footer{max-width:880px;margin:0 auto;padding:0 20px 40px;color:#9a8cb0;font-size:13px}
+
+.howto{counter-reset:step;list-style:none;display:flex;gap:14px;flex-wrap:wrap;
+  margin:0 0 20px;padding:0}
+.howto li{flex:1 1 210px;counter-increment:step;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;padding:15px 18px 15px 46px;
+  position:relative;font-size:14.5px;color:#413355}
+.howto li::before{content:counter(step);position:absolute;left:15px;top:14px;
+  width:21px;height:21px;border-radius:50%;
+  background:linear-gradient(95deg,var(--hot),var(--p-500));color:#fff;
+  font-size:12.5px;font-weight:700;display:flex;align-items:center;
+  justify-content:center}
+.howto b{color:var(--p-900)}

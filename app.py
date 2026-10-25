@@ -5,7 +5,7 @@ Run:  python app.py      then open http://localhost:5000
 import secrets
 import threading
 
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, g, jsonify, redirect, render_template, request, url_for
 
 from encore import config, events, log, service
 
@@ -13,15 +13,36 @@ config.load_env()
 
 app = Flask(__name__, template_folder="encore/templates",
             static_folder="encore/static")
-app.secret_key = secrets.token_hex(16)
 
 _run_lock = threading.Lock()
 
+COOKIE = "encore_id"
+COOKIE_MAX_AGE = 365 * 24 * 60 * 60
+
+# A plain cookie, not a signed Flask session. Flask's session needs a secret
+# key, and a key generated at startup changes on every restart -- which would
+# silently sign every visitor out and orphan their log. Nothing here is
+# protected by the id: it only says which log file is yours, so there is
+# nothing to forge and nothing worth signing.
+
 
 def sid() -> str:
-    if "sid" not in session:
-        session["sid"] = secrets.token_hex(6)
-    return session["sid"]
+    """This visitor's id, minted on first sight and remembered for a year."""
+    if "sid" not in g:
+        existing = request.cookies.get(COOKIE, "")
+        cleaned = "".join(c for c in existing.lower() if c in "0123456789abcdef")
+        g.sid = cleaned[:12] if len(cleaned) >= 8 else secrets.token_hex(6)
+        g.fresh_sid = g.sid != existing
+    return g.sid
+
+
+@app.after_request
+def persist_sid(response):
+    """Send the id back whenever this request minted or reused one."""
+    if g.get("sid") and g.get("fresh_sid"):
+        response.set_cookie(COOKIE, g.sid, max_age=COOKIE_MAX_AGE,
+                            samesite="Lax", httponly=True)
+    return response
 
 
 @app.route("/discover")
@@ -90,6 +111,7 @@ def add_bulk():
         existing = log.read(log.user_path(session_id))
         log.write(existing + parsed, session=session_id)
         events.record("add_bulk", session_id, count=len(parsed))
+        return redirect(url_for("discover"))
     return redirect(url_for("show_log"))
 
 

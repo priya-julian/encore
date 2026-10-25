@@ -6,10 +6,19 @@
     <p class="sub">{{ rows|length }} show{{ '' if rows|length == 1 else 's' }} ·
       this is what Encore reads your taste from.</p>
   {% else %}
-    <p class="sub">Add a few concerts you've been to and Encore will read every
-      upcoming Austin show against your taste.</p>
+    <p class="sub">Encore reads every upcoming Austin show against your own
+      concert history.</p>
   {% endif %}
 </section>
+
+{% if not own %}
+<ol class="howto">
+  <li><b>Paste bands you've seen live</b> — five or ten is plenty.</li>
+  <li><b>Hit the button.</b> Encore reads ~460 upcoming Austin shows against
+      your taste.</li>
+  <li><b>You get five picks</b>, each with the reason it fits you.</li>
+</ol>
+{% endif %}
 
 <div class="addbox open">
   <form method="post" action="{{ url_for('add_bulk') }}">
