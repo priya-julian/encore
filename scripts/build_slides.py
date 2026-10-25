@@ -107,7 +107,18 @@ def build() -> str:
   .pub {{ background:var(--blue); color:#fff; border-radius:99px;
           padding:1px 9px; font-size:.82em; margin-left:6px; }}
 </style></head>
-<body><div class="reveal"><div class="slides">
+<body>
+<noscript>
+  <div style="max-width:620px;margin:60px auto;padding:22px 26px;
+              border:1px solid #e6dcf7;border-radius:14px;background:#f7f2ff;
+              font:16px/1.6 ui-sans-serif,system-ui,sans-serif;color:#1b1230">
+    <b>This deck needs JavaScript.</b> It is a reveal.js presentation and the
+    slides stay hidden until the script runs. Open <code>slides.html</code> in
+    a normal browser window (double-click it) and they will appear. Use the
+    arrow keys to move between the ten slides.
+  </div>
+</noscript>
+<div class="reveal"><div class="slides">
 
 <section class="center">
   <h1>Encore</h1>
@@ -286,8 +297,13 @@ confidence downgraded: high -> medium</div>
 
 </div></div>
 <script>{reveal_js}</script>
-<script>Reveal.initialize({{hash:true, slideNumber:'c/t', transition:'fade',
-  width:1100, height:700, margin:0.06}});</script>
+<script>
+  // No hash routing: it drives history.replaceState, which some browsers
+  // refuse on a file:// URL, and a throw there would leave the deck blank
+  // for anyone who opened the file by double-clicking it.
+  Reveal.initialize({{hash:false, slideNumber:'c/t', transition:'fade',
+    width:1100, height:700, margin:0.06}});
+</script>
 </body></html>
 """
 
