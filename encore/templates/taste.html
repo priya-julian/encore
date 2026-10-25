@@ -2,25 +2,32 @@
 {% block body %}
 <section class="hero">
   <h1>Your taste</h1>
-  <p class="sub">What Encore thinks it learned. If this is wrong, the picks will be too.</p>
+  <p class="sub">What Encore learned from your log. If this is wrong, the picks
+    will be too.</p>
 </section>
 <div id="profile" class="status"><span class="spinner"></span> Reading your log…</div>
 <script>
 fetch('/api/profile').then(r => r.json()).then(p => {
   const el = document.getElementById('profile');
-  if (p.error) { el.textContent = p.error; return; }
+  if (p.error) {
+    el.className = '';
+    el.innerHTML = `<div class="empty"><h3>Nothing to read yet</h3>
+      <p>Add a few concerts and Encore will work out what you're into.</p>
+      <a class="btn" href="/log">Add my shows</a></div>`;
+    return;
+  }
   el.className = '';
-  const list = (items) => items.map(i => `<li>${i}</li>`).join('');
+  const list = items => (items || []).map(i => `<li>${i}</li>`).join('');
   el.innerHTML = `
     <blockquote class="summary">${p.summary}</blockquote>
     <div class="cols">
-      <div class="col"><h3>Loves</h3><ul>${list(p.loves || [])}</ul></div>
-      <div class="col"><h3>Avoids</h3><ul>${list(p.avoids || [])}</ul></div>
+      <div class="col"><h3>Turns up for</h3><ul>${list(p.loves)}</ul></div>
+      <div class="col"><h3>Leaves cold</h3><ul>${list(p.avoids)}</ul></div>
     </div>
     <dl class="facts">
-      <dt>Venues</dt><dd>${p.venue_preference || ''}</dd>
+      <dt>Rooms</dt><dd>${p.venue_preference || ''}</dd>
       <dt>Discovery</dt><dd>${p.discovery_appetite || ''}</dd>
-      <dt>Built from</dt><dd>${p.shows} shows · ${p.confidence} confidence</dd>
+      <dt>Read from</dt><dd>${p.shows} shows · ${p.confidence} confidence</dd>
     </dl>`;
 });
 </script>

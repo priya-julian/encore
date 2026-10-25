@@ -3,26 +3,36 @@
 <section class="hero">
   <h1>My shows</h1>
   {% if own %}
-    <p class="sub">{{ rows|length }} shows · this is what Encore reads your
-    taste from.</p>
+    <p class="sub">{{ rows|length }} show{{ '' if rows|length == 1 else 's' }} ·
+      this is what Encore reads your taste from.</p>
   {% else %}
-    <p class="sub">You're looking at the owner's log. <b>Add a few of your own
-    shows</b> and Encore will read your taste instead.</p>
+    <p class="sub">Add a few concerts you've been to and Encore will read every
+      upcoming Austin show against your taste.</p>
   {% endif %}
 </section>
 
 <div class="addbox open">
   <form method="post" action="{{ url_for('add_bulk') }}">
-    <label class="bulk-label">Paste shows you've been to — one per line.
+    <label class="bulk-label">Paste bands you've seen live — one per line.
       Add <code>loved</code>, <code>liked</code>, <code>fine</code> or
-      <code>meh</code> after a dash to rate them.</label>
-    <textarea name="bulk" rows="6" placeholder="Phoebe Bridgers - loved
+      <code>meh</code> after a dash if you want to rate them.</label>
+    <textarea name="bulk" rows="7" autofocus placeholder="Phoebe Bridgers - loved
 Turnstile, Mohawk, loved
 LCD Soundsystem - Emo's - liked
 Kesha - meh"></textarea>
-    <button type="submit">Add these</button>
+    <button type="submit">{{ 'Add these' if own else 'Add my shows' }}</button>
   </form>
 </div>
+
+{% if not own %}
+<div class="empty" style="margin-bottom:18px">
+  <h3>Just want to look around?</h3>
+  <p>Load a 31-show demo log and see what Encore does with it.</p>
+  <form method="post" action="{{ url_for('load_demo') }}">
+    <button type="submit" class="btn">Load the demo log</button>
+  </form>
+</div>
+{% endif %}
 
 <details class="addbox">
   <summary>Add one show with details</summary>
@@ -37,7 +47,7 @@ Kesha - meh"></textarea>
       <option value="fine">fine</option>
       <option value="meh">meh</option>
     </select>
-    <input name="notes" placeholder="One line on why it landed — this is the best signal">
+    <input name="notes" placeholder="One line on why it landed — the best signal there is">
     <button type="submit">Add</button>
   </form>
 </details>
@@ -57,9 +67,9 @@ Kesha - meh"></textarea>
   {% endfor %}
   </tbody>
 </table>
-{% endif %}
 
-{% if own %}
+<p style="margin-top:20px"><a class="btn" href="{{ url_for('discover') }}">See my shows →</a></p>
+
 <form method="post" action="{{ url_for('reset_log') }}" class="resetform"
       onsubmit="return confirm('Clear your log and start over?')">
   <button type="submit" class="linkish">Clear my log</button>

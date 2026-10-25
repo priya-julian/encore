@@ -4,16 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Encore — {{ page|capitalize }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="{{ url_for('discover') }}">
-    <span class="mark">◗</span> Encore
+  <a class="brand" href="{{ url_for('show_log') }}">
+    <svg class="vinyl" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="19" fill="#120820"/>
+      <g fill="none" stroke="#3b2a55" stroke-width="1">
+        <circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="13.5"/>
+        <circle cx="20" cy="20" r="11"/>
+      </g>
+      <circle cx="20" cy="20" r="7.5" fill="#8b3dff"/>
+      <circle cx="20" cy="20" r="7.5" fill="none" stroke="#ff3d9a" stroke-width="1.4"/>
+      <circle cx="20" cy="20" r="1.7" fill="#120820"/>
+      <path d="M20 1 A19 19 0 0 1 33.4 6.6 L20 20 Z" fill="#fff" opacity=".07"/>
+    </svg>
+    <span class="word">Encore</span>
   </a>
   <nav>
-    <a href="{{ url_for('discover') }}" class="{{ 'on' if page=='discover' }}">Discover</a>
     <a href="{{ url_for('show_log') }}" class="{{ 'on' if page=='log' }}">My shows</a>
+    <a href="{{ url_for('discover') }}" class="{{ 'on' if page=='discover' }}">Discover</a>
     <a href="{{ url_for('taste') }}" class="{{ 'on' if page=='taste' }}">Taste</a>
   </nav>
 </header>

@@ -24,7 +24,7 @@ def sid() -> str:
     return session["sid"]
 
 
-@app.route("/")
+@app.route("/discover")
 def discover():
     return render_template("discover.html", page="discover")
 
@@ -52,6 +52,7 @@ def api_event():
     return jsonify({"ok": True})
 
 
+@app.route("/")
 @app.route("/log")
 def show_log():
     session_id = sid()
@@ -59,7 +60,7 @@ def show_log():
     order = {"loved": 0, "liked": 1, "fine": 2, "meh": 3}
     rows.sort(key=lambda r: (order.get(r["gut_rating"], 9), r["artist"].lower()))
     return render_template("log.html", page="log", rows=rows,
-                           own=log.is_own_log(session_id))
+                           own=log.has_log(session_id))
 
 
 @app.route("/log/add", methods=["POST"])
@@ -90,6 +91,15 @@ def add_bulk():
         log.write(existing + parsed, session=session_id)
         events.record("add_bulk", session_id, count=len(parsed))
     return redirect(url_for("show_log"))
+
+
+@app.route("/log/demo", methods=["POST"])
+def load_demo():
+    """Opt in to the shipped demo log -- how a grader sees the app work."""
+    session_id = sid()
+    rows = log.load_demo(session_id)
+    events.record("load_demo", session_id, count=len(rows))
+    return redirect(url_for("discover"))
 
 
 @app.route("/log/reset", methods=["POST"])

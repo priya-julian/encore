@@ -17,7 +17,7 @@
     <div class="rank"></div>
     <div class="card-body">
       <h2 class="artist"></h2>
-      <p class="meta"></p>
+      <p class="when"></p>
       <p class="why"></p>
       <div class="badges"></div>
       <div class="actions">
@@ -36,6 +36,24 @@ const statusEl = document.getElementById('status');
 const picksEl  = document.getElementById('picks');
 const meterEl  = document.getElementById('meterline');
 
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
+                'Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function prettyDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  if (!m) return iso || '';
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  if (isNaN(d)) return iso;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const days = Math.round((d - today) / 86400000);
+  const label = `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+  if (days === 0) return label + ' · tonight';
+  if (days === 1) return label + ' · tomorrow';
+  if (days > 1 && days < 14) return `${label} · in ${days} days`;
+  return label;
+}
+
 function badge(text, cls) {
   const b = document.createElement('span');
   b.className = 'badge ' + cls;
@@ -53,11 +71,26 @@ async function sendEvent(kind, artist, btn) {
   });
 }
 
+function showEmpty(message) {
+  statusEl.style.display = 'none';
+  picksEl.innerHTML = `
+    <div class="empty">
+      <h3>Nothing to go on yet</h3>
+      <p>${message}</p>
+      <a class="btn" href="/log">Add my shows</a>
+    </div>`;
+}
+
 function render(data) {
   picksEl.innerHTML = '';
   if (data.error) {
-    statusEl.innerHTML = '<b>Could not load picks.</b> ' + data.error;
-    statusEl.className = 'status error';
+    if (/log/i.test(data.error)) {
+      showEmpty('Encore needs a few concerts you&rsquo;ve been to before it can '
+                + 'pick shows for you.');
+    } else {
+      statusEl.innerHTML = '<b>Could not load picks.</b> ' + data.error;
+      statusEl.className = 'status error';
+    }
     return;
   }
   statusEl.className = 'status';
@@ -67,27 +100,37 @@ function render(data) {
     const node = document.getElementById('card-tpl').content.cloneNode(true);
     node.querySelector('.rank').textContent = p.rank;
     node.querySelector('.artist').textContent = p.artist;
-    const bits = [p.date, p.venue || 'venue TBA'];
-    if (p.support) bits.push('with ' + p.support);
-    node.querySelector('.meta').textContent = bits.join(' · ');
+
+    const when = node.querySelector('.when');
+    when.textContent = prettyDate(p.date);
+    const venue = document.createElement('span');
+    venue.className = 'venue';
+    venue.textContent = '  ·  ' + (p.venue || 'venue TBA')
+      + (p.support ? '  ·  with ' + p.support : '');
+    when.appendChild(venue);
+
     node.querySelector('.why').textContent = p.why;
 
     const badges = node.querySelector('.badges');
-    if (p.verified) badges.appendChild(badge('✓ details verified', 'ok'));
-    else badges.appendChild(badge('⚠ partly unverified', 'warn'));
+    // An Austin hometown is the local-discovery signal and worth surfacing.
+    // Anywhere else just reads like a second venue, so it is left out.
+    const home = (p.research && p.research.hometown) || '';
+    if (/austin/i.test(home)) badges.appendChild(badge('Austin band', 'local'));
+    badges.appendChild(p.verified
+      ? badge('details verified', 'ok')
+      : badge('partly unverified', 'warn'));
     badges.appendChild(badge(p.confidence + ' confidence', 'muted'));
-    if (p.research && p.research.hometown) {
-      // Source data can be very precise ("Blue Mountains region, New South
-      // Wales, Australia"); the city is the part a reader wants.
-      const where = p.research.hometown.split(',')[0].trim();
-      badges.appendChild(badge(where, 'muted'));
-    }
 
     node.querySelectorAll('.chip').forEach(btn => {
       btn.addEventListener('click', () => sendEvent(btn.dataset.kind, p.artist, btn));
     });
     picksEl.appendChild(node);
   });
+
+  if (!data.picks.length) {
+    showEmpty('No upcoming shows matched your taste this time.');
+    return;
+  }
 
   const m = data.meter || {};
   meterEl.textContent =
@@ -99,9 +142,11 @@ function render(data) {
 
 async function load(force) {
   statusEl.style.display = '';
+  statusEl.className = 'status';
   statusEl.innerHTML = '<span class="spinner"></span> ' +
     (force ? 'Re-reading every Austin venue…' : 'Reading Austin listings…');
   picksEl.innerHTML = '';
+  meterEl.textContent = '';
   const res = await fetch('/api/picks' + (force ? '?force=1' : ''));
   render(await res.json());
 }

@@ -29,18 +29,30 @@ def user_path(session: str) -> Path:
 
 
 def log_path(session: str = "") -> Path:
-    """This session's log, else the owner's, else the shipped sample."""
+    """This session's own log.
+
+    A visitor starts empty rather than inheriting anyone else's shows: seeing
+    someone else's log would quietly mean their first recommendations were
+    read from someone else's taste. The demo log is opt-in, one click away on
+    the My shows screen.
+    """
     if session:
         own = user_path(session)
         if own.is_file() and read(own):
             return own
-    if OWNER_LOG.is_file() and read(OWNER_LOG):
-        return OWNER_LOG
-    return SAMPLE_LOG
+        return own
+    return OWNER_LOG
 
 
-def is_own_log(session: str) -> bool:
-    return bool(session) and log_path(session) == user_path(session)
+def load_demo(session: str) -> list[dict]:
+    """Copy the shipped demo log into this session, so it can then be edited."""
+    rows = read(OWNER_LOG) or read(SAMPLE_LOG)
+    write(rows, session=session)
+    return rows
+
+
+def has_log(session: str) -> bool:
+    return bool(session) and bool(read(user_path(session)))
 
 
 def read(path: Path | None = None, session: str = "") -> list[dict]:

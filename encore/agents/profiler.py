@@ -21,19 +21,26 @@ Return JSON:
   "confidence": str
 }
 
-- "summary" is 2-3 sentences in second person ("You go out for..."). Specific
-  and recognisable, not horoscope-vague.
-- "loves" and "avoids" are 4-6 short phrases each: scenes, sounds, eras,
-  kinds of show. Ground them in the actual log.
-- "venue_preference" covers room size and setting, inferred from the venues.
-- "discovery_appetite": do they turn up for unknown local acts, or mostly
-  established touring artists?
-- "confidence": "low", "medium" or "high", based on how many shows and how
-  much variety the log has. Say low if the log is thin.
-- Never invent an artist that is not in the log.
-- Turned-down recommendations are real negative signal, but they are weaker
-  than a show they actually attended and rated. Do not let one rejection
-  outweigh the pattern of the log.
+Voice: write with conviction, in second person. State what is true of them
+rather than hedging about it. No "seems to", "appears to", "moderate to high",
+"you may", "somewhat". If the log is too thin to support a claim, leave the
+claim out instead of qualifying it.
+
+- "summary": 2-3 sentences. Specific and recognisable, never horoscope-vague.
+- "loves" and "avoids": 4-5 short phrases each, describing SOUNDS, SCENES,
+  ERAS and KINDS OF SHOW. Never name an artist, band or venue in these lists --
+  the reader already knows who they have seen; what they want back is the
+  pattern underneath. "Arena pop built on spectacle" not "shows like Kesha".
+- "avoids" comes from their lowest-rated shows and anything they turned down.
+  Describe what did not land, not who.
+- "venue_preference": room size and setting, in one sentence.
+- "discovery_appetite": one sentence on whether they turn out for unfamiliar
+  acts or stick to artists they already know.
+- "confidence": "low", "medium" or "high", from how many shows and how much
+  variety the log has.
+- Base everything on the log. Never invent a show they did not attend.
+- Turned-down recommendations are real negative signal, but weaker than a
+  show they attended and rated. Do not let one rejection outweigh the log.
 """
 
 
