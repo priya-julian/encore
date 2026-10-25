@@ -252,6 +252,15 @@ best show you saw last year was a local band you had never heard of.</p>
 what you have seen and how much you liked it &mdash; is the one input none of
 these services has.</p>
 
+<p>The cost is easy to understate because it is not a bill. Austin club
+tickets run roughly $20&ndash;35, so missing a show you would have loved is a
+small financial loss and a large opportunity one: that particular band, that
+particular room, that particular night does not recur. Across the 31 shows in
+my own log, I can name four I only heard about afterwards. At a conservative
+one missed show a month, the thing Encore is competing with is not another app
+&mdash; it is the half hour a week nobody spends, and the shows that quietly
+pass by as a result.</p>
+
 <h2>2. What is new</h2>
 
 <p>Rating and logging apps exist for most media: Letterboxd for film,
@@ -322,6 +331,51 @@ deliberately harsh, most shows score below 40 &mdash; and only the top 14
 receive Scholar research and careful ranking. That single ordering decision is
 the difference between a run costing cents and a run costing dollars, and it
 is the backbone of section 5.</p>
+
+<h3>Why five agents rather than one prompt</h3>
+
+<p>A single prompt could, in principle, be handed the listings and the log and
+asked for five picks. It would be worse for three specific reasons, each of
+which showed up during development.</p>
+
+<p><b>Different inputs need different trust levels.</b> Scout reads
+attacker-controllable third-party text; Profiler reads the user's own data.
+Collapsing them means one prompt holding both, with no way to say "treat this
+half as hostile and that half as authoritative." Splitting them is what makes
+the injection defence in section 5 expressible at all.</p>
+
+<p><b>Different stages have different unit economics.</b> Screening is
+per-show and must be cheap; final ranking is per-run and can afford to be
+careful. One prompt forces one cost profile for both, and the expensive one
+wins. Separating them is what turns a dollar-scale run into a cent-scale
+one.</p>
+
+<p><b>A checker must not be the author.</b> Asking one prompt to produce
+recommendations and then audit its own claims produces an agent that marks its
+own homework. The Verifier sees the recommendation and the research, but not
+the reasoning that produced it, and it is prompted adversarially. That
+separation is why it flags its own system's output rather than rubber-stamping
+it.</p>
+
+<h3>What each agent gets wrong</h3>
+
+<table>
+<tr><th>Agent</th><th>Characteristic failure</th><th>Mitigation</th></tr>
+<tr><td><b>Scout</b></td><td>Mis-splits a messy title, or treats a benefit gig
+as one act</td><td>Verifier traces every artist back to the source string</td></tr>
+<tr><td><b>Profiler</b></td><td>Over-reads a thin log and states preferences
+the data does not support</td><td>Reports its own confidence; the Taste screen
+exposes the profile for the user to correct</td></tr>
+<tr><td><b>Scholar</b></td><td>Confidently describes a different band with the
+same name</td><td>Exact-name matching, local-city preference, explicit
+<code>known: false</code> rather than a guess</td></tr>
+<tr><td><b>Ranker</b></td><td>Writes a plausible reason the research does not
+support</td><td>Verifier flags unsupported claims and downgrades
+confidence</td></tr>
+<tr><td><b>Verifier</b></td><td>Over-flags figurative language as an
+unsupported claim</td><td>Prompted to be strict on specifics and relaxed on
+tone; flags downgrade rather than drop</td></tr>
+</table>
 
 <h3>A traced run</h3>
 
@@ -400,6 +454,16 @@ inherently per-user: it scores the city against <i>your</i> profile. At the
 application level even that is cached against a fingerprint of the log, so
 revisiting the page costs nothing; {money(warm["cost_usd"])} is the price of a
 fresh ranking after the log changes.</p>
+
+<h3>What was deliberately not optimised</h3>
+
+<p>Two obvious savings were rejected. <b>Caching the screening pass across
+users</b> would be the largest remaining win, since screening is now most of
+the warm cost &mdash; but screening is a function of the user's taste profile,
+so sharing it would mean serving one person's judgement to another. The point
+of the app is that the ranking is yours. <b>Dropping the Verifier</b> would
+save about 7% of a run, and was rejected because the whole claim of the
+product is that what reaches the screen has been checked.</p>
 
 <h3>Cost at scale</h3>
 
@@ -520,6 +584,17 @@ does not work around it &mdash; those sites are excluded in code with a
 comment explaining why. Their shows still reach users via the community
 listing source, which is published to be read.</p>
 
+<h3>Risk 4: personal data</h3>
+
+<p>A concert history is mildly personal: it implies where someone was on a
+given night. Encore holds as little as it can. There are no accounts, no email
+addresses and no passwords. A visitor is identified by a random twelve-character
+cookie that maps to one CSV file and protects nothing, so there is no
+credential to steal. Usage events store that same random id, an event type and
+an artist name &mdash; never an IP address, a user agent or anything that
+identifies a person. The logs of the people who tested Encore were never read
+individually; only the aggregate counts in the next section were.</p>
+
 <h2>6. Impact</h2>
 
 <div class="kpis">
@@ -572,6 +647,15 @@ biggest barrier to a new user.</li>
 <li><b>No feedback loop yet.</b> "Not for me" is recorded but does not yet
 feed back into the profile. Treating those clicks as negative signal is the
 most direct path to improving picks over time.</li>
+<li><b>Logs do not survive a redeploy.</b> Identity is a year-long cookie and
+logs are files on disk, which survives restarts but not the host rebuilding
+its filesystem. Mirroring the log into the browser's local storage would fix
+this without accounts or a database; real accounts would be a larger change
+for a smaller benefit.</li>
+<li><b>Display type is loaded from a CDN.</b> The interface asks Google Fonts
+for Bebas Neue and Space Grotesk. The app already requires network access for
+the model, and there are system fallbacks, but it is one more thing that can
+be slow or blocked.</li>
 <li><b>Travel mode.</b> "I'll be in Chicago November 14&ndash;17, what's on?"
 is the same pipeline with a different city and date window, and is the most
 requested extension from early conversations.</li>
