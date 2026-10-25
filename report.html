@@ -2,21 +2,25 @@
 <html lang="en"><head><meta charset="utf-8">
 <title>Encore — MGT 409 Final Project</title>
 <style>
-  :root { --blue:#2f6fd0; --dark:#0b2545; --line:#d6e2f4; --dim:#5b6b85; }
+  :root { --blue:#8b3dff; --hot:#ff3d9a; --dark:#1a0b2e; --line:#e6dcf7;
+           --dim:#6b5b85; --soft:#f7f2ff; }
   body { font:15px/1.6 Georgia,"Times New Roman",serif; color:#16233a;
           max-width:760px; margin:0 auto; padding:40px 28px 80px; }
   h1 { font-size:30px; margin:0 0 4px; color:var(--dark); line-height:1.2; }
   h2 { font-size:20px; margin:38px 0 10px; padding-bottom:6px;
         border-bottom:2px solid var(--line); color:var(--dark); }
+  h2::after { content:""; display:block; width:58px; height:3px;
+        margin:6px 0 -8px; border-radius:2px;
+        background:linear-gradient(90deg,var(--hot),var(--blue)); }
   h3 { font-size:16px; margin:22px 0 6px; color:var(--dark); }
   .sub { color:var(--dim); margin:0 0 18px; font-size:16px; }
-  .links { background:#eef4fd; border-radius:10px; padding:14px 18px;
+  .links { background:var(--soft); border-radius:10px; padding:14px 18px;
             font-family:ui-sans-serif,system-ui,sans-serif; font-size:14px; }
   .links div { margin:3px 0; }
   .links b { display:inline-block; min-width:92px; color:var(--dark); }
   table { border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;
            font-family:ui-sans-serif,system-ui,sans-serif; }
-  th { background:#eef4fd; color:var(--dark); text-align:left;
+  th { background:var(--soft); color:var(--dark); text-align:left;
         padding:8px 10px; font-size:13px; }
   td { padding:8px 10px; border-top:1px solid var(--line);
         vertical-align:top; }
@@ -26,22 +30,22 @@
   figure img { width:100%; border:1px solid var(--line); border-radius:8px; }
   figcaption { color:var(--dim); font-size:13px; margin-top:6px;
                 font-family:ui-sans-serif,system-ui,sans-serif; }
-  pre { background:#0b2545; color:#dbe7f8; padding:14px 16px; border-radius:8px;
+  pre { background:var(--dark); color:#e4d9fb; padding:14px 16px; border-radius:8px;
          font-size:12.5px; line-height:1.5; overflow-x:auto; }
-  pre b { color:#8fd4a8; }
-  blockquote { margin:14px 0; padding:10px 18px; background:#f6f9fe;
-                border-left:3px solid var(--blue); font-style:italic; }
+  pre b { color:#5ee6a0; }
+  blockquote { margin:14px 0; padding:10px 18px; background:var(--soft);
+                border-left:3px solid var(--hot); font-style:italic; }
   .kpis { display:flex; gap:12px; flex-wrap:wrap; margin:16px 0; }
-  .kpi { flex:1 1 150px; background:#f6f9fe; border:1px solid var(--line);
+  .kpi { flex:1 1 150px; background:var(--soft); border:1px solid var(--line);
           border-radius:10px; padding:14px; text-align:center;
           font-family:ui-sans-serif,system-ui,sans-serif; }
   .kpi b { display:block; font-size:24px; color:var(--dark); }
   .kpi span { font-size:12px; color:var(--dim); }
   .diagram { width:100%; height:auto; margin:14px 0; }
-  .diagram .t { font:12px ui-sans-serif,system-ui,sans-serif; fill:#16233a;
+  .diagram .t { font:12px ui-sans-serif,system-ui,sans-serif; fill:#1b1230;
                  text-anchor:middle; }
   .diagram .b { font-weight:700; }
-  .diagram .s { font-size:10.5px; fill:#5b6b85; }
+  .diagram .s { font-size:10.5px; fill:#6b5b85; }
   .diagram .w { fill:#fff; }
   .missing { color:#b4442e; font-family:monospace; }
   .todo { background:#fdf0dc; border-left:3px solid #d99a2b; padding:8px 14px;
@@ -146,53 +150,53 @@ all of them.</p>
      role="img" aria-label="Encore agent architecture">
   <defs>
     <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3"
-            orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#7ba7e8"/></marker>
+            orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#c4a0ff"/></marker>
   </defs>
-  <rect x="8" y="18" width="150" height="62" rx="9" fill="#eef4fd"
-        stroke="#d6e2f4"/>
+  <rect x="8" y="18" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
   <text x="83" y="42" class="t b">Showlist Austin</text>
   <text x="83" y="60" class="t s">459 shows, 43 days</text>
 
-  <rect x="8" y="118" width="150" height="62" rx="9" fill="#eef4fd"
-        stroke="#d6e2f4"/>
+  <rect x="8" y="118" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
   <text x="83" y="142" class="t b">Your show log</text>
   <text x="83" y="160" class="t s">31 rated concerts</text>
 
-  <rect x="8" y="218" width="150" height="62" rx="9" fill="#eef4fd"
-        stroke="#d6e2f4"/>
+  <rect x="8" y="218" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
   <text x="83" y="242" class="t b">Bandcamp ·</text>
   <text x="83" y="260" class="t s">MusicBrainz · Wikipedia</text>
 
   <rect x="210" y="18" width="150" height="62" rx="9" fill="#fff"
-        stroke="#2f6fd0"/>
+        stroke="#8b3dff"/>
   <text x="285" y="42" class="t b">Scout</text>
   <text x="285" y="60" class="t s">fetch + extract</text>
 
   <rect x="210" y="118" width="150" height="62" rx="9" fill="#fff"
-        stroke="#2f6fd0"/>
+        stroke="#8b3dff"/>
   <text x="285" y="142" class="t b">Profiler</text>
   <text x="285" y="160" class="t s">taste profile</text>
 
   <rect x="210" y="218" width="150" height="62" rx="9" fill="#fff"
-        stroke="#2f6fd0"/>
+        stroke="#8b3dff"/>
   <text x="285" y="242" class="t b">Scholar</text>
   <text x="285" y="260" class="t s">artist research</text>
 
   <rect x="412" y="68" width="150" height="62" rx="9" fill="#fff"
-        stroke="#2f6fd0"/>
+        stroke="#8b3dff"/>
   <text x="487" y="92" class="t b">Ranker · screen</text>
   <text x="487" y="110" class="t s">459 &#8594; 14</text>
 
   <rect x="412" y="168" width="150" height="62" rx="9" fill="#fff"
-        stroke="#2f6fd0"/>
+        stroke="#8b3dff"/>
   <text x="487" y="192" class="t b">Ranker · final</text>
   <text x="487" y="210" class="t s">14 &#8594; 5 with reasons</text>
 
-  <rect x="610" y="118" width="140" height="62" rx="9" fill="#0b2545"/>
+  <rect x="610" y="118" width="140" height="62" rx="9" fill="#1a0b2e"/>
   <text x="680" y="142" class="t b w">Verifier</text>
   <text x="680" y="160" class="t s w">fact-check</text>
 
-  <g stroke="#7ba7e8" fill="none" marker-end="url(#a)">
+  <g stroke="#c4a0ff" fill="none" marker-end="url(#a)">
     <path d="M158,49 L204,49"/>
     <path d="M158,149 L204,149"/>
     <path d="M158,249 L204,249"/>
@@ -498,30 +502,30 @@ individually; only the aggregate counts in the next section were.</p>
 <h2>6. Impact</h2>
 
 <div class="kpis">
-  <div class="kpi"><b>0</b><span>people used it</span></div>
-  <div class="kpi"><b>0.0%</b><span>found a show they
+  <div class="kpi"><b>3</b><span>people used it</span></div>
+  <div class="kpi"><b>33.3%</b><span>found a show they
     didn't know about</span></div>
-  <div class="kpi"><b>0</b><span>shows recommended</span></div>
-  <div class="kpi"><b>0.0</b><span>runs per person</span></div>
+  <div class="kpi"><b>20</b><span>shows recommended</span></div>
+  <div class="kpi"><b>1.3</b><span>runs per person</span></div>
 </div>
 
 <table>
 <tr><th>Measure</th><th class="n">Value</th><th>How it is counted</th></tr>
-<tr><td>People who used it</td><td class="n">0</td>
+<tr><td>People who used it</td><td class="n">3</td>
 <td>Distinct visitors who ran Encore or entered shows &mdash; a page load
 alone does not count</td></tr>
-<tr><td>Built their own log</td><td class="n">0</td>
+<tr><td>Built their own log</td><td class="n">3</td>
 <td>Entered at least one concert of their own rather than loading the
 demo</td></tr>
-<tr><td>Discovery runs</td><td class="n">0</td>
-<td>Completed pipeline runs, 0.0 per person</td></tr>
-<tr><td>Shows recommended</td><td class="n">0</td>
+<tr><td>Discovery runs</td><td class="n">4</td>
+<td>Completed pipeline runs, 1.3 per person</td></tr>
+<tr><td>Shows recommended</td><td class="n">20</td>
 <td>Picks shown across all runs</td></tr>
-<tr><td>"Didn't know this" clicks</td><td class="n">0</td>
-<td>From 0 people &mdash;
-0.0% of users</td></tr>
-<tr><td>Shows saved</td><td class="n">0</td>
-<td>From 0 people &mdash; 0.0% of
+<tr><td>"Didn't know this" clicks</td><td class="n">3</td>
+<td>From 1 people &mdash;
+33.3% of users</td></tr>
+<tr><td>Shows saved</td><td class="n">2</td>
+<td>From 1 people &mdash; 33.3% of
 users</td></tr>
 <tr><td>"Not for me"</td><td class="n">0</td>
 <td>Rejections, which feed back into the taste profile</td></tr>

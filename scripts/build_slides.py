@@ -20,6 +20,18 @@ APP_URL = "https://encore-8pjj.onrender.com"
 REPO_URL = "github.com/priya-julian/encore"
 
 
+def font_face() -> str:
+    """Inline the display face so the deck needs no network at all."""
+    path = VENDOR / "bebas.woff2"
+    if not path.is_file():
+        return ""
+    b64 = base64.b64encode(path.read_bytes()).decode()
+    return (
+        "@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;"
+        f"src:url(data:font/woff2;base64,{b64}) format('woff2');}}"
+    )
+
+
 def data_uri(name: str) -> str:
     path = ASSETS / name
     if not path.is_file():
@@ -36,6 +48,7 @@ def build() -> str:
 
     cold, warm, scale = t["cold"], t["warm"], t["scale"]
     reveal_css = (VENDOR / "reveal.css").read_text()
+    face = font_face()
     theme_css = (VENDOR / "white.css").read_text()
     reveal_js = (VENDOR / "reveal.js").read_text()
 
@@ -45,34 +58,42 @@ def build() -> str:
 <style>{reveal_css}</style>
 <style>{theme_css}</style>
 <style>
-  :root {{ --blue:#2f6fd0; --dark:#0b2545; --dim:#5b6b85; --line:#d6e2f4; }}
+  {face}
+  :root {{ --blue:#8b3dff; --hot:#ff3d9a; --dark:#1a0b2e; --deep:#4c1d95;
+           --dim:#6b5b85; --line:#e6dcf7; --soft:#f7f2ff; }}
   .reveal {{ font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
-             font-size:30px; color:#16233a; }}
+             font-size:30px; color:#1b1230; }}
   .reveal h1,.reveal h2,.reveal h3 {{ color:var(--dark); text-transform:none;
-             font-weight:700; letter-spacing:-.5px; }}
-  .reveal h1 {{ font-size:2.0em; }}
-  .reveal h2 {{ font-size:1.25em; margin-bottom:.4em; }}
+             font-family:"Bebas Neue",Impact,sans-serif; font-weight:400;
+             letter-spacing:1.2px; }}
+  .reveal h1 {{ font-size:2.6em; }}
+  .reveal h2 {{ font-size:1.7em; margin-bottom:.35em; }}
+  .reveal h2::after {{ content:""; display:block; width:74px; height:4px;
+             margin-top:10px; border-radius:2px;
+             background:linear-gradient(90deg,var(--hot),var(--blue)); }}
   .reveal section {{ text-align:left; }}
   .reveal .center {{ text-align:center; }}
   .reveal p.lead {{ color:var(--dim); font-size:.8em; margin-top:0; }}
   .reveal ul {{ font-size:.78em; }}
   .reveal li {{ margin-bottom:.35em; }}
-  .reveal strong {{ color:var(--blue); }}
+  .reveal strong {{ color:var(--deep); }}
   .kpis {{ display:flex; gap:18px; margin:.5em 0; }}
-  .kpi {{ flex:1; background:#f6f9fe; border:1px solid var(--line);
-          border-radius:12px; padding:18px 10px; text-align:center; }}
-  .kpi b {{ display:block; font-size:1.3em; color:var(--dark); }}
+  .kpi {{ flex:1; background:var(--soft); border:1px solid var(--line);
+          border-radius:14px; padding:18px 10px; text-align:center; }}
+  .kpi b {{ display:block; font-size:1.7em; color:var(--dark);
+            font-family:"Bebas Neue",Impact,sans-serif; letter-spacing:.5px; }}
   .kpi span {{ font-size:.46em; color:var(--dim); }}
   .reveal table {{ font-size:.58em; width:100%; }}
-  .reveal th {{ background:#eef4fd; color:var(--dark); }}
+  .reveal th {{ background:var(--soft); color:var(--deep); }}
   .reveal td, .reveal th {{ padding:7px 10px; }}
   .n {{ text-align:right; font-variant-numeric:tabular-nums; }}
-  .shot {{ border:1px solid var(--line); border-radius:10px; max-height:60vh; }}
-  .quote {{ background:#f6f9fe; border-left:4px solid var(--blue);
+  .shot {{ border:1px solid var(--line); border-radius:12px; max-height:60vh;
+           box-shadow:0 6px 26px rgba(76,29,149,.16); }}
+  .quote {{ background:var(--soft); border-left:4px solid var(--hot);
             padding:14px 22px; font-size:.68em; font-style:italic; }}
-  .pass {{ color:#1f6b42; font-weight:700; }}
+  .pass {{ color:#5ee6a0; font-weight:700; }}
   .mono {{ font-family:ui-monospace,Menlo,monospace; font-size:.62em;
-           background:#0b2545; color:#dbe7f8; padding:14px 18px;
+           background:var(--dark); color:#e4d9fb; padding:14px 18px;
            border-radius:10px; white-space:pre; }}
   .foot {{ position:absolute; bottom:-10px; left:0; font-size:.4em;
            color:var(--dim); }}
