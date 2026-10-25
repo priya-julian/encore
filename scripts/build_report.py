@@ -640,6 +640,12 @@ random session id. These numbers are read from the deployed app's event log at
 build time, with a baseline timestamp excluding development testing, so
 nothing here counts the author.</p>
 
+<p class="s"><b>On sample size.</b> These figures come from
+{impact["sessions"]} people over a single evening, recruited from friends who
+go to shows in Austin. That is enough to show the app works for people other
+than its author, and not enough to support a percentage quoted to one decimal
+place. Treat the proportions as indicative; the counts are exact.</p>
+
 <p><b>The headline measure is "didn't know this."</b> Encore's claim is not
 that it finds good shows &mdash; a list of every Austin gig does that &mdash;
 but that it finds shows a particular person would have missed. That click is
