@@ -13,3 +13,7 @@
 {"ts": 1792970262.9, "kind": "add_bulk", "session": "00051517e857", "count": 6}
 {"ts": 1792970313.7, "kind": "run", "session": "00051517e857", "count": 5, "considered": 463, "cached": false, "cost": 0.01188}
 {"ts": 1792970313.7, "kind": "save", "session": "9b8c94d501c3", "artist": "Teddy Swims"}
+{"ts": 1792970620.4, "kind": "load_demo", "session": "0ba505d38821", "count": 31}
+{"ts": 1792970620.8, "kind": "run", "session": "0ba505d38821", "count": 5, "considered": 463, "cached": true, "cost": 0.03455}
+{"ts": 1792970661.1, "kind": "add_bulk", "session": "2e9e5394318e", "count": 4}
+{"ts": 1792970711.6, "kind": "run", "session": "2e9e5394318e", "count": 5, "considered": 463, "cached": false, "cost": 0.01234}

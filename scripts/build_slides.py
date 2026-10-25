@@ -99,6 +99,13 @@ def build() -> str:
            color:var(--dim); }}
   .two {{ display:flex; gap:26px; align-items:flex-start; }}
   .two > div {{ flex:1; }}
+  .links {{ display:inline-block; text-align:left; background:var(--soft);
+            border:1px solid var(--line); border-radius:12px;
+            padding:13px 20px; font-size:.5em; line-height:1.75; }}
+  .links b {{ display:inline-block; min-width:86px; color:var(--deep); }}
+  .links a {{ color:var(--blue); }}
+  .pub {{ background:var(--blue); color:#fff; border-radius:99px;
+          padding:1px 9px; font-size:.82em; margin-left:6px; }}
 </style></head>
 <body><div class="reveal"><div class="slides">
 
@@ -106,11 +113,14 @@ def build() -> str:
   <h1>Encore</h1>
   <p class="lead">Rank the concerts you've been to;<br>
   Encore tells you which upcoming shows you'd regret missing.</p>
-  <p style="font-size:.5em;color:#5b6b85">
-    Priya Julian · MGT 409 · Fall 2026<br>
-    <a href="{APP_URL}">{APP_URL.replace("https://", "")}</a> ·
-    <a href="https://{REPO_URL}">{REPO_URL}</a>
+  <p style="font-size:.52em;color:#6b5b85;margin-bottom:.2em">
+    Priya Julian · MGT 409 · Fall 2026
   </p>
+  <div class="links">
+    <div><b>Repo</b> <a href="https://{REPO_URL}">https://{REPO_URL}</a>
+      <span class="pub">public</span></div>
+    <div><b>Live app</b> <a href="{APP_URL}">{APP_URL}</a></div>
+  </div>
 </section>
 
 <section>
@@ -267,6 +277,11 @@ confidence downgraded: high -> medium</div>
     <li><strong>Travel mode:</strong> "I'm in Chicago Nov 14–17, what's on?"
         is the same pipeline, different window.</li>
   </ul>
+  <div class="links" style="margin-top:.5em">
+    <div><b>Repo</b> <a href="https://{REPO_URL}">https://{REPO_URL}</a>
+      <span class="pub">public</span></div>
+    <div><b>Live app</b> <a href="{APP_URL}">{APP_URL}</a></div>
+  </div>
 </section>
 
 </div></div>
