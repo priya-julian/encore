@@ -410,6 +410,14 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
            color:var(--dim); }
   .two { display:flex; gap:26px; align-items:flex-start; }
   .two > div { flex:1; }
+  .cap { font-size:.5em; line-height:1.6; color:#413355; margin-top:.3em; }
+  .diagwrap { text-align:center; }
+  .diagwrap svg { width:760px; height:330px; max-width:100%; }
+  .diagwrap .t { font:12px ui-sans-serif,system-ui,sans-serif; fill:#1b1230;
+                  text-anchor:middle; }
+  .diagwrap .b { font-weight:700; }
+  .diagwrap .s { font-size:10.5px; fill:#6b5b85; }
+  .diagwrap .w { fill:#fff; }
   .links { display:inline-block; text-align:left; background:var(--soft);
             border:1px solid var(--line); border-radius:12px;
             padding:13px 20px; font-size:.5em; line-height:1.75; }
@@ -480,21 +488,76 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
 
 <section>
   <h2>Five agents</h2>
-  <table>
-    <tr><th>Agent</th><th>Job</th><th>Tools</th></tr>
-    <tr><td><b>Scout</b></td><td>Listings → structured shows</td>
-        <td>HTTP, JSON parsing</td></tr>
-    <tr><td><b>Profiler</b></td><td>Log → taste profile</td><td>Your CSV</td></tr>
-    <tr><td><b>Scholar</b></td><td>Research unknown artists</td>
-        <td>Bandcamp, MusicBrainz, Wikipedia</td></tr>
-    <tr><td><b>Ranker</b></td><td>Screen 459 → 14 → 5</td>
-        <td>Profile + research</td></tr>
-    <tr><td><b>Verifier</b></td><td>Fact-check every pick</td>
-        <td>Deterministic + model</td></tr>
-  </table>
-  <p style="font-size:.6em;margin-top:.6em">Ordered <strong>cheap to
-  expensive</strong>: screening is coarse and harsh, so Scholar runs on 14
-  shows instead of 459.</p>
+  <div class="diagwrap">
+<svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" class="diagram"
+     role="img" aria-label="Encore agent architecture">
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3"
+            orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#c4a0ff"/></marker>
+  </defs>
+  <rect x="8" y="18" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
+  <text x="83" y="42" class="t b">Showlist Austin</text>
+  <text x="83" y="60" class="t s">459 shows, 43 days</text>
+
+  <rect x="8" y="118" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
+  <text x="83" y="142" class="t b">Your show log</text>
+  <text x="83" y="160" class="t s">31 rated concerts</text>
+
+  <rect x="8" y="218" width="150" height="62" rx="9" fill="#f7f2ff"
+        stroke="#e6dcf7"/>
+  <text x="83" y="242" class="t b">Bandcamp ·</text>
+  <text x="83" y="260" class="t s">MusicBrainz · Wikipedia</text>
+
+  <rect x="210" y="18" width="150" height="62" rx="9" fill="#fff"
+        stroke="#8b3dff"/>
+  <text x="285" y="42" class="t b">Scout</text>
+  <text x="285" y="60" class="t s">fetch + extract</text>
+
+  <rect x="210" y="118" width="150" height="62" rx="9" fill="#fff"
+        stroke="#8b3dff"/>
+  <text x="285" y="142" class="t b">Profiler</text>
+  <text x="285" y="160" class="t s">taste profile</text>
+
+  <rect x="210" y="218" width="150" height="62" rx="9" fill="#fff"
+        stroke="#8b3dff"/>
+  <text x="285" y="242" class="t b">Scholar</text>
+  <text x="285" y="260" class="t s">artist research</text>
+
+  <rect x="412" y="68" width="150" height="62" rx="9" fill="#fff"
+        stroke="#8b3dff"/>
+  <text x="487" y="92" class="t b">Ranker · screen</text>
+  <text x="487" y="110" class="t s">459 &#8594; 14</text>
+
+  <rect x="412" y="168" width="150" height="62" rx="9" fill="#fff"
+        stroke="#8b3dff"/>
+  <text x="487" y="192" class="t b">Ranker · final</text>
+  <text x="487" y="210" class="t s">14 &#8594; 5 with reasons</text>
+
+  <rect x="610" y="118" width="140" height="62" rx="9" fill="#1a0b2e"/>
+  <text x="680" y="142" class="t b w">Verifier</text>
+  <text x="680" y="160" class="t s w">fact-check</text>
+
+  <g stroke="#c4a0ff" fill="none" marker-end="url(#a)">
+    <path d="M158,49 L204,49"/>
+    <path d="M158,149 L204,149"/>
+    <path d="M158,249 L204,249"/>
+    <path d="M360,49 C390,49 386,95 406,99"/>
+    <path d="M360,149 C390,149 386,105 406,101"/>
+    <path d="M487,130 L487,162"/>
+    <path d="M360,249 C395,249 400,205 406,201"/>
+    <path d="M562,199 C590,199 596,160 604,155"/>
+  </g>
+</svg>
+</div>
+  <p class="cap"><strong>Scout</strong> structures the listings ·
+  <strong>Profiler</strong> reads your log · <strong>Scholar</strong>
+  researches unknowns (Bandcamp, MusicBrainz, Wikipedia) ·
+  <strong>Ranker</strong> screens 459 &#8594; 14 &#8594; 5 ·
+  <strong>Verifier</strong> fact-checks every pick.
+  Ordered <strong>cheap to expensive</strong>, so research runs on 14 shows,
+  not 459.</p>
 </section>
 
 <section>

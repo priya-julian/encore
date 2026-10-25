@@ -42,6 +42,7 @@ def data_uri(name: str) -> str:
 def build() -> str:
     t = json.loads((ROOT / "data" / "tokenomics.json").read_text())
     from encore import events
+    from encore.diagram import SVG
 
     impact = (events.summary(events.LIVE_PATH)
               if events.LIVE_PATH.is_file() else events.summary())
@@ -99,6 +100,14 @@ def build() -> str:
            color:var(--dim); }}
   .two {{ display:flex; gap:26px; align-items:flex-start; }}
   .two > div {{ flex:1; }}
+  .cap {{ font-size:.5em; line-height:1.6; color:#413355; margin-top:.3em; }}
+  .diagwrap {{ text-align:center; }}
+  .diagwrap svg {{ width:760px; height:330px; max-width:100%; }}
+  .diagwrap .t {{ font:12px ui-sans-serif,system-ui,sans-serif; fill:#1b1230;
+                  text-anchor:middle; }}
+  .diagwrap .b {{ font-weight:700; }}
+  .diagwrap .s {{ font-size:10.5px; fill:#6b5b85; }}
+  .diagwrap .w {{ fill:#fff; }}
   .links {{ display:inline-block; text-align:left; background:var(--soft);
             border:1px solid var(--line); border-radius:12px;
             padding:13px 20px; font-size:.5em; line-height:1.75; }}
@@ -169,21 +178,14 @@ def build() -> str:
 
 <section>
   <h2>Five agents</h2>
-  <table>
-    <tr><th>Agent</th><th>Job</th><th>Tools</th></tr>
-    <tr><td><b>Scout</b></td><td>Listings → structured shows</td>
-        <td>HTTP, JSON parsing</td></tr>
-    <tr><td><b>Profiler</b></td><td>Log → taste profile</td><td>Your CSV</td></tr>
-    <tr><td><b>Scholar</b></td><td>Research unknown artists</td>
-        <td>Bandcamp, MusicBrainz, Wikipedia</td></tr>
-    <tr><td><b>Ranker</b></td><td>Screen {cold["shows_considered"]} → 14 → 5</td>
-        <td>Profile + research</td></tr>
-    <tr><td><b>Verifier</b></td><td>Fact-check every pick</td>
-        <td>Deterministic + model</td></tr>
-  </table>
-  <p style="font-size:.6em;margin-top:.6em">Ordered <strong>cheap to
-  expensive</strong>: screening is coarse and harsh, so Scholar runs on 14
-  shows instead of {cold["shows_considered"]}.</p>
+  <div class="diagwrap">{SVG}</div>
+  <p class="cap"><strong>Scout</strong> structures the listings ·
+  <strong>Profiler</strong> reads your log · <strong>Scholar</strong>
+  researches unknowns (Bandcamp, MusicBrainz, Wikipedia) ·
+  <strong>Ranker</strong> screens {cold["shows_considered"]} &#8594; 14 &#8594; 5 ·
+  <strong>Verifier</strong> fact-checks every pick.
+  Ordered <strong>cheap to expensive</strong>, so research runs on 14 shows,
+  not {cold["shows_considered"]}.</p>
 </section>
 
 <section>

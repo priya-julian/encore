@@ -1,0 +1,57 @@
+ENCORE — traced run
+model gpt-6-luna · 2026-10-25 19:52
+==================================================================
+
+[1] SCOUT — fetch and structure the city's listings
+    source      austin.showlists.net (one request)
+    in          43 days of raw listings
+    out         428 shows across 25 venues
+    injections  none flagged
+    example     ACID MOTHERS TEMPLE @ 13th Floor (2026-10-25)
+    from source "ACID MOTHERS TEMPLE w/ MAGICK POTION & MY EDUCATION + BROT"
+
+[2] PROFILER — read the user's log into a taste profile
+    in          31 rated concerts
+    out         confidence: high
+    loves       Emotion-forward alternative pop; Melodic indie rock with a strong live-band feel; Folk-rock and rootsy, singalong songwriting
+    avoids      Swaggering mainstream radio rock; Contemporary R&B grooves; Glossy pop built around club production
+    calls       1
+
+[3] RANKER (screen) — score every show, cheaply
+    in          428 shows, batched 55 per call
+    out         428 scored; keeping top 14
+    spend       8 calls, 0 cache hits, 13026 in / 14677 out, $0.00864
+       95  Adrianne Lenker                Intimate, emotionally vivid so
+       91  Julia Jacklin                  Emotion-forward indie songwrit
+       88  They Might Be Giants           Quirky, melodic alternative po
+       88  They Might Be Giants           Distinctive alternative pop an
+      ...  cut-off at 79 (median of all 428: 34)
+
+[4] SCHOLAR — research only the shortlist
+    Adrianne Lenker              known=True  Indie folk
+      sounds like Gillian Welch, Elliott Smith, and Phoebe Bridger
+    Julia Jacklin                known=True  Indie folk, indie pop, alterna
+      sounds like Angel Olsen, Sharon Van Etten, and Waxahatchee
+    They Might Be Giants         known=True  Alternative rock
+      sounds like Devo, XTC, Sparks
+    spend       0 calls, 3 cache hits, 0 in / 0 out, $0.00000 (for 3 of 14)
+
+[5] RANKER (final) + [6] VERIFIER
+    #1 Adrianne Lenker                  2026-11-23 @ Austin City Limits L
+       why        You gravitate toward intimate, emotionally vivid folk, and Adrianne Le
+       verified   True · confidence high
+    #2 Julia Jacklin                    2026-11-03 @ Radio East
+       why        You like indie folk that can swell into a cathartic moment; Julia Jack
+       verified   True · confidence high
+    #3 Band Of Horses                   2026-11-20 @ Stubb's
+       why        You enjoy melodic indie rock with a big live-band feel, and Band of Ho
+       verified   False · confidence medium · flagged: ['Band of Horses has a melodic sound']
+    #4 American Aquarium                2026-12-05 @ 3TEN Austin City Lim
+       why        You’re drawn to rootsy songwriting, and American Aquarium’s alt-countr
+       verified   True · confidence medium
+    #5 They Might Be Giants             2026-11-07 @ Emo's
+       why        You like distinctive pop and rock when there’s real personality behind
+       verified   True · confidence medium
+
+==================================================================
+TOTAL  9.4s · 1 calls, 43 cache hits, 879 in / 974 out, $0.00057

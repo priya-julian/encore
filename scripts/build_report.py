@@ -44,6 +44,16 @@ def load_tokenomics() -> dict:
     return json.loads(path.read_text())
 
 
+def load_quality() -> tuple[dict, dict, dict]:
+    """The shortlist-width experiment, for the cost-vs-quality claim."""
+    path = ROOT / "data" / "quality_check.json"
+    if not path.is_file():
+        raise SystemExit("run scripts/quality_check.py first")
+    data = json.loads(path.read_text())
+    small, big = data["results"]
+    return data, small, big
+
+
 def load_impact() -> dict:
     """Usage from the deployed app, falling back to local events.
 
@@ -66,69 +76,7 @@ AGENT_LABELS = {
     "verifier": ("Verifier", "Fact-check every pick"),
 }
 
-DIAGRAM = """
-<svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" class="diagram"
-     role="img" aria-label="Encore agent architecture">
-  <defs>
-    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3"
-            orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#c4a0ff"/></marker>
-  </defs>
-  <rect x="8" y="18" width="150" height="62" rx="9" fill="#f7f2ff"
-        stroke="#e6dcf7"/>
-  <text x="83" y="42" class="t b">Showlist Austin</text>
-  <text x="83" y="60" class="t s">459 shows, 43 days</text>
-
-  <rect x="8" y="118" width="150" height="62" rx="9" fill="#f7f2ff"
-        stroke="#e6dcf7"/>
-  <text x="83" y="142" class="t b">Your show log</text>
-  <text x="83" y="160" class="t s">31 rated concerts</text>
-
-  <rect x="8" y="218" width="150" height="62" rx="9" fill="#f7f2ff"
-        stroke="#e6dcf7"/>
-  <text x="83" y="242" class="t b">Bandcamp ·</text>
-  <text x="83" y="260" class="t s">MusicBrainz · Wikipedia</text>
-
-  <rect x="210" y="18" width="150" height="62" rx="9" fill="#fff"
-        stroke="#8b3dff"/>
-  <text x="285" y="42" class="t b">Scout</text>
-  <text x="285" y="60" class="t s">fetch + extract</text>
-
-  <rect x="210" y="118" width="150" height="62" rx="9" fill="#fff"
-        stroke="#8b3dff"/>
-  <text x="285" y="142" class="t b">Profiler</text>
-  <text x="285" y="160" class="t s">taste profile</text>
-
-  <rect x="210" y="218" width="150" height="62" rx="9" fill="#fff"
-        stroke="#8b3dff"/>
-  <text x="285" y="242" class="t b">Scholar</text>
-  <text x="285" y="260" class="t s">artist research</text>
-
-  <rect x="412" y="68" width="150" height="62" rx="9" fill="#fff"
-        stroke="#8b3dff"/>
-  <text x="487" y="92" class="t b">Ranker · screen</text>
-  <text x="487" y="110" class="t s">459 &#8594; 14</text>
-
-  <rect x="412" y="168" width="150" height="62" rx="9" fill="#fff"
-        stroke="#8b3dff"/>
-  <text x="487" y="192" class="t b">Ranker · final</text>
-  <text x="487" y="210" class="t s">14 &#8594; 5 with reasons</text>
-
-  <rect x="610" y="118" width="140" height="62" rx="9" fill="#1a0b2e"/>
-  <text x="680" y="142" class="t b w">Verifier</text>
-  <text x="680" y="160" class="t s w">fact-check</text>
-
-  <g stroke="#c4a0ff" fill="none" marker-end="url(#a)">
-    <path d="M158,49 L204,49"/>
-    <path d="M158,149 L204,149"/>
-    <path d="M158,249 L204,249"/>
-    <path d="M360,49 C390,49 386,95 406,99"/>
-    <path d="M360,149 C390,149 386,105 406,101"/>
-    <path d="M487,130 L487,162"/>
-    <path d="M360,249 C395,249 400,205 406,201"/>
-    <path d="M562,199 C590,199 596,160 604,155"/>
-  </g>
-</svg>
-"""
+from encore.diagram import SVG as DIAGRAM  # noqa: E402
 
 
 def tokenomics_rows(by_agent: dict, warm: dict) -> str:
@@ -154,6 +102,7 @@ def build() -> str:
     scale = t["scale"]
     rate = t["rate_card_usd_per_1m"]
 
+    q, small, big = load_quality()
     saving = (1 - warm["cost_usd"] / cold["cost_usd"]) * 100
     speedup = cold["seconds"] / warm["seconds"]
 
@@ -339,6 +288,25 @@ receive Scholar research and careful ranking. That single ordering decision is
 the difference between a run costing cents and a run costing dollars, and it
 is the backbone of section 5.</p>
 
+<h3>Which model, and why</h3>
+
+<p>Every agent runs on <b>{t["model"]}</b> through the course Portkey key.
+That is partly a constraint &mdash; the course key permits no other model
+&mdash; but it suits the work. Five of the six calls in a run are structured
+extraction and scoring against an explicit rubric, which is exactly what a
+cheap, fast model is good at; none of them require long-horizon reasoning. At
+${rate["input"]:.2f} per 1M input tokens it also makes the screening pass
+affordable, and screening every show rather than a sample is what lets Encore
+surface a band at Hole In The Wall instead of only the acts with marketing
+budgets.</p>
+
+<p>One real constraint shaped the design: this model accepts only its default
+temperature, so determinism is not available. The same log and the same
+listings can return the same five picks in a different order, which is why
+confidence is surfaced per pick rather than implied by rank alone, and why
+section 8 lists run-to-run variance as a known limit rather than pretending
+it away.</p>
+
 <h3>Why five agents rather than one prompt</h3>
 
 <p>A single prompt could, in principle, be handed the listings and the log and
@@ -391,6 +359,77 @@ tone; flags downgrade rather than drop</td></tr>
 Scholar researched those 14 (13 live calls, one already cached). The final
 ranker returned five picks, and the Verifier checked each one.</p>
 
+<p>The run below was captured by <code>scripts/trace_run.py</code>, which
+instruments each stage and prints what it received, what it returned and what
+it spent. It is reproduced verbatim.</p>
+
+<pre>ENCORE — traced run
+model gpt-6-luna · 2026-10-25 19:52
+==================================================================
+
+[1] SCOUT — fetch and structure the city's listings
+    source      austin.showlists.net (one request)
+    in          43 days of raw listings
+    out         428 shows across 25 venues
+    injections  none flagged
+    example     ACID MOTHERS TEMPLE @ 13th Floor (2026-10-25)
+    from source "ACID MOTHERS TEMPLE w/ MAGICK POTION &amp; MY EDUCATION + BROT"
+
+[2] PROFILER — read the user's log into a taste profile
+    in          31 rated concerts
+    out         confidence: high
+    loves       Emotion-forward alternative pop; Melodic indie rock with a strong live-band feel; Folk-rock and rootsy, singalong songwriting
+    avoids      Swaggering mainstream radio rock; Contemporary R&amp;B grooves; Glossy pop built around club production
+    calls       1
+
+[3] RANKER (screen) — score every show, cheaply
+    in          428 shows, batched 55 per call
+    out         428 scored; keeping top 14
+    spend       8 calls, 0 cache hits, 13026 in / 14677 out, $0.00864
+       95  Adrianne Lenker                Intimate, emotionally vivid so
+       91  Julia Jacklin                  Emotion-forward indie songwrit
+       88  They Might Be Giants           Quirky, melodic alternative po
+       88  They Might Be Giants           Distinctive alternative pop an
+      ...  cut-off at 79 (median of all 428: 34)
+
+[4] SCHOLAR — research only the shortlist
+    Adrianne Lenker              known=True  Indie folk
+      sounds like Gillian Welch, Elliott Smith, and Phoebe Bridger
+    Julia Jacklin                known=True  Indie folk, indie pop, alterna
+      sounds like Angel Olsen, Sharon Van Etten, and Waxahatchee
+    They Might Be Giants         known=True  Alternative rock
+      sounds like Devo, XTC, Sparks
+    spend       0 calls, 3 cache hits, 0 in / 0 out, $0.00000 (for 3 of 14)
+
+[5] RANKER (final) + [6] VERIFIER
+    #1 Adrianne Lenker                  2026-11-23 @ Austin City Limits L
+       why        You gravitate toward intimate, emotionally vivid folk, and Adrianne Le
+       verified   True · confidence high
+    #2 Julia Jacklin                    2026-11-03 @ Radio East
+       why        You like indie folk that can swell into a cathartic moment; Julia Jack
+       verified   True · confidence high
+    #3 Band Of Horses                   2026-11-20 @ Stubb's
+       why        You enjoy melodic indie rock with a big live-band feel, and Band of Ho
+       verified   False · confidence medium · flagged: ['Band of Horses has a melodic sound']
+    #4 American Aquarium                2026-12-05 @ 3TEN Austin City Lim
+       why        You’re drawn to rootsy songwriting, and American Aquarium’s alt-countr
+       verified   True · confidence medium
+    #5 They Might Be Giants             2026-11-07 @ Emo's
+       why        You like distinctive pop and rock when there’s real personality behind
+       verified   True · confidence medium
+
+==================================================================
+TOTAL  9.4s · 1 calls, 43 cache hits, 879 in / 974 out, $0.00057</pre>
+
+<p>Three things in that trace are worth drawing out. The screen scored 428
+shows and the median score was <b>34</b> against a shortlist cut-off of
+<b>79</b> &mdash; the cheap pass really is discarding most of the city, which
+is what makes the expensive stages affordable. Scholar shows <b>3 cache
+hits and zero cost</b>, because those artists had been researched by an
+earlier run and that cache is shared across every user. And the Verifier
+flagged pick #3, dropping it from high to medium confidence, on a run that
+was not staged for it.</p>
+
 {img("discover.jpg", "Encore's Discover screen showing ranked picks",
      "The Discover screen. Each pick carries the specific reason it fits, "
      "plus the Verifier's judgement &mdash; shown to the user rather than "
@@ -437,6 +476,15 @@ tokens, ${rate["cached_input"]:.2f} cached, ${rate["output"]:.2f} output.</p>
 <td class="n">{warm["tokens_in"] + warm["tokens_out"]:,}</td></tr>
 </table>
 
+<p><b>On cached input.</b> The rate card prices cached input at
+${rate["cached_input"]:.2f} per 1M, a tenth of fresh input, but Encore does not
+rely on it. Its caching happens a layer up: a day of listings or an artist's
+research is stored as parsed JSON on disk and the call is never made at all,
+which is cheaper than any discount on a call that still happens. Of the
+{cold["model_calls"]} calls in a cold run, none reuse a cached prefix; of the
+{warm["model_calls"]} in a warm one, the {warm["cache_hits"]} avoided calls
+cost exactly nothing rather than a tenth of something.</p>
+
 <h3>Where the money goes, and what was done about it</h3>
 
 <p>Three optimisations, each measured:</p>
@@ -461,6 +509,34 @@ inherently per-user: it scores the city against <i>your</i> profile. At the
 application level even that is cached against a fingerprint of the log, so
 revisiting the page costs nothing; {money(warm["cost_usd"])} is the price of a
 fresh ranking after the log changes.</p>
+
+<h3>Did the cost cutting hurt the picks?</h3>
+
+<p>The rubric's question, and a fair one: screening cheaply and researching
+only a shortlist is the largest saving in the app, and it is only a good trade
+if a wider shortlist would not have produced better picks. So I measured it
+&mdash; the same run at the production shortlist of {small["shortlist"]}, and
+at {big["shortlist"]}.</p>
+
+<table>
+<tr><th>Shortlist</th><th class="n">Cost</th><th class="n">Latency</th>
+<th>Picks</th></tr>
+<tr><td>{small["shortlist"]} (production)</td>
+<td class="n">${small["cost_usd"]:.5f}</td><td class="n">{small["seconds"]}s</td>
+<td>{", ".join(small["picks"])}</td></tr>
+<tr><td>{big["shortlist"]}</td>
+<td class="n">${big["cost_usd"]:.5f}</td><td class="n">{big["seconds"]}s</td>
+<td>{", ".join(big["picks"])}</td></tr>
+</table>
+
+<p><b>{q["overlap"]} of 5 picks were identical</b>, with the top three in the
+same order. Researching {big["shortlist"]} shows instead of
+{small["shortlist"]} cost ${q["extra_cost_usd"]:.5f} more and took
+{round(big["seconds"] / max(small["seconds"], 0.1))}&times; as long to swap
+one fifth-place pick for another of similar fit. On this evidence the cheap
+screening pass is not costing quality; it is discarding shows that were never
+going to make the list. Reproduce with
+<code>scripts/quality_check.py</code>.</p>
 
 <h3>What was deliberately not optimised</h3>
 

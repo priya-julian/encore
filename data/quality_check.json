@@ -1,0 +1,32 @@
+{
+  "measured_at": "2026-10-25 19:52",
+  "shows_considered": 428,
+  "results": [
+    {
+      "shortlist": 14,
+      "picks": [
+        "Adrianne Lenker",
+        "Julia Jacklin",
+        "Band Of Horses",
+        "American Aquarium",
+        "They Might Be Giants"
+      ],
+      "seconds": 3.4,
+      "cost_usd": 0.00911
+    },
+    {
+      "shortlist": 40,
+      "picks": [
+        "Julia Jacklin",
+        "Adrianne Lenker",
+        "Band Of Horses",
+        "American Aquarium",
+        "The War And Treaty"
+      ],
+      "seconds": 15.8,
+      "cost_usd": 0.01144
+    }
+  ],
+  "overlap": 4,
+  "extra_cost_usd": 0.00233
+}
