@@ -76,3 +76,4 @@
 {"ts": 1793043756.4, "kind": "add_bulk", "session": "c1f358b16d0e", "count": 5}
 {"ts": 1793043809.5, "kind": "run", "session": "c1f358b16d0e", "count": 5, "considered": 352, "cached": false, "cost": 0.01051, "shown": ["OSEES", "Paul Cauthen", "The War And Treaty", "Band Of Horses", "Buzzcocks"]}
 {"ts": 1793044108.4, "kind": "run", "session": "c1f358b16d0e", "count": 5, "considered": 347, "cached": false, "cost": 0.01076, "shown": ["Ty Myers", "Medium Build", "Adrianne Lenker", "Tiny Habits", "Eric Ben\u00e9t"]}
+{"ts": 1793044323.1, "kind": "run", "session": "c1f358b16d0e", "count": 5, "considered": 352, "cached": true, "cost": 0.01051, "shown": ["OSEES", "Paul Cauthen", "The War And Treaty", "Band Of Horses", "Buzzcocks"]}
