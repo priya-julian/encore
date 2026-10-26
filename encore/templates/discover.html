@@ -20,6 +20,7 @@
       <p class="when"></p>
       <p class="why"></p>
       <div class="badges"></div>
+      <div class="listen"></div>
       <div class="actions">
         <button data-kind="new_to_me" class="chip">Didn't know this</button>
         <button data-kind="save" class="chip">Save</button>
@@ -121,6 +122,27 @@ function render(data) {
       ? badge('details verified', 'ok')
       : badge('partly unverified', 'warn'));
     badges.appendChild(badge(p.confidence + ' confidence', 'muted'));
+
+    const listen = node.querySelector('.listen');
+    const links = (p.research && p.research.listen) || {};
+    const LABELS = {spotify: 'Spotify', apple: 'Apple Music', bandcamp: 'Bandcamp'};
+    Object.keys(LABELS).forEach(k => {
+      if (!links[k]) return;
+      const a = document.createElement('a');
+      a.className = 'listen-link ' + k;
+      a.href = links[k];
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = LABELS[k];
+      listen.appendChild(a);
+    });
+    if (p.also_playing) {
+      const more = document.createElement('span');
+      more.className = 'alsoplaying';
+      more.textContent = `also playing ${p.also_playing} other date`
+        + (p.also_playing > 1 ? 's' : '');
+      listen.appendChild(more);
+    }
 
     node.querySelectorAll('.chip').forEach(btn => {
       btn.addEventListener('click', () => sendEvent(btn.dataset.kind, p.artist, btn));

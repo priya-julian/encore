@@ -93,12 +93,14 @@ def _normalise(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
 
 
-def _bandcamp(artist: str, city_hint: str = "Austin") -> str:
+def _bandcamp(artist: str, city_hint: str = "Austin") -> tuple[str, str]:
     """Bandcamp knows small local bands that MusicBrainz and Wikipedia miss.
 
     Only an exact name match counts. Fuzzy search happily returns a different
     band with a similar name, and describing the wrong band is worse than
     admitting we do not know this one.
+
+    Returns (summary, artist_page_url); either may be empty.
     """
     try:
         resp = requests.post(
@@ -109,15 +111,15 @@ def _bandcamp(artist: str, city_hint: str = "Austin") -> str:
             timeout=15,
         )
         if resp.status_code != 200:
-            return ""
+            return "", ""
         results = (resp.json().get("auto") or {}).get("results") or []
     except (requests.RequestException, ValueError):
-        return ""
+        return "", ""
 
     target = _normalise(artist)
     exact = [r for r in results if _normalise(r.get("name")) == target]
     if not exact:
-        return ""
+        return "", ""
     # Prefer the local one when several bands share a name.
     local = [r for r in exact if city_hint.lower() in (r.get("location") or "").lower()]
     hit = (local or exact)[0]
@@ -132,12 +134,13 @@ def _bandcamp(artist: str, city_hint: str = "Austin") -> str:
         parts.append("tags: " + ", ".join(tags[:6]))
     elif hit.get("genre_name"):
         parts.append(f"genre: {hit['genre_name']}")
-    bio = _bandcamp_bio(hit.get("item_url_root") or "")
+    root = hit.get("item_url_root") or ""
+    bio = _bandcamp_bio(root)
     if bio:
         parts.append(f"self-description: {bio}")
     if len(exact) > 1 and not local:
         parts.append("(several bands share this name -- match is uncertain)")
-    return " | ".join(parts)
+    return " | ".join(parts), root
 
 
 def _bandcamp_bio(root: str) -> str:
@@ -178,12 +181,31 @@ def _wikipedia(artist: str) -> str:
     return (data.get("extract") or "")[:1200]
 
 
-def _search(artist: str) -> str:
-    """Gather what keyless public sources know about an artist."""
-    parts = [
-        p for p in (_bandcamp(artist), _musicbrainz(artist), _wikipedia(artist)) if p
-    ]
-    return re.sub(r"\s{2,}", " ", "\n".join(parts))[:MAX_SNIPPET_CHARS]
+def _search(artist: str) -> tuple[str, str]:
+    """Gather what keyless public sources know about an artist.
+
+    Returns (source_text, bandcamp_url).
+    """
+    bandcamp_text, bandcamp_url = _bandcamp(artist)
+    parts = [p for p in (bandcamp_text, _musicbrainz(artist), _wikipedia(artist)) if p]
+    return re.sub(r"\s{2,}", " ", "\n".join(parts))[:MAX_SNIPPET_CHARS], bandcamp_url
+
+
+def listen_links(artist: str, bandcamp: str = "") -> dict:
+    """Where to hear an artist, without needing anyone's API key.
+
+    Spotify and Apple Music both resolve a plain search URL, which is enough
+    to press play. Bandcamp, when we have it, is the better link for a small
+    local act -- it is usually their own page.
+    """
+    q = requests.utils.quote(artist)
+    links = {
+        "spotify": f"https://open.spotify.com/search/{q}",
+        "apple": f"https://music.apple.com/us/search?term={q}",
+    }
+    if bandcamp.startswith("https://") and bandcamp.endswith(".bandcamp.com"):
+        links["bandcamp"] = bandcamp
+    return links
 
 
 def research(artist: str, meter=None) -> dict:
@@ -197,10 +219,10 @@ def research(artist: str, meter=None) -> dict:
         except (json.JSONDecodeError, OSError):
             pass
 
-    snippets = _search(artist)
+    snippets, bandcamp = _search(artist)
     if not snippets:
         return {"sounds_like": "", "genre": "", "hometown": "", "one_liner": "",
-                "known": False}
+                "known": False, "listen": listen_links(artist)}
 
     user = (
         f"Artist: {artist}\n\n"
@@ -213,8 +235,9 @@ def research(artist: str, meter=None) -> dict:
                                       json_mode=True))
     except Exception:
         return {"sounds_like": "", "genre": "", "hometown": "", "one_liner": "",
-                "known": False}
+                "known": False, "listen": listen_links(artist, bandcamp)}
 
+    out["listen"] = listen_links(artist, bandcamp)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(out))
     return out

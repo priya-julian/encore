@@ -58,7 +58,13 @@ def get_picks(force: bool = False, session: str = "") -> dict:
     same shows share a cached result rather than paying twice.
     """
     rows = log.read(session=session)
-    rejected = events.rejected_artists(session)
+    rejected = list(events.rejected_artists(session))
+    if force:
+        # An explicit Re-run is a request for different shows, not the same
+        # five again; what they were just shown is treated like a rejection
+        # for this run only.
+        rejected += [a for a in events.recently_shown(session)
+                     if a not in rejected]
     meter = llm.Meter()
     started = time.time()
 

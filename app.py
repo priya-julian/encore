@@ -59,7 +59,8 @@ def api_picks():
         events.record("run", sid(), count=len(result["picks"]),
                       considered=result.get("considered", 0),
                       cached=result.get("from_cache", False),
-                      cost=round(result.get("cost", 0), 5))
+                      cost=round(result.get("cost", 0), 5),
+                      shown=[p["artist"] for p in result["picks"]])
     return jsonify(result)
 
 

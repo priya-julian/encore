@@ -75,6 +75,24 @@ def rejected_artists(session: str = "", limit: int = 40) -> list[str]:
     return seen
 
 
+def recently_shown(session: str, limit: int = 15) -> list[str]:
+    """Artists this visitor was shown on their last couple of runs.
+
+    Re-run should mean "show me something else". Without this it returns the
+    same five, because the taste profile has not changed.
+    """
+    out: list[str] = []
+    for row in reversed(load()):
+        if row.get("kind") != "run" or row.get("session") != session[:12]:
+            continue
+        for artist in row.get("shown", []):
+            if artist and artist not in out:
+                out.append(artist)
+        if len(out) >= limit:
+            break
+    return out[:limit]
+
+
 def summary(path: Path | None = None) -> dict:
     """Usage summary, with the per-user rates the write-up needs.
 

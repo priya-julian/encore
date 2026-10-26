@@ -57,6 +57,30 @@ def load_blocks(window: int, today: date, force: bool = False) -> list[dict]:
     return showlist.group_by_day(records)
 
 
+def collapse(shows: list[dict]) -> list[dict]:
+    """One entry per artist, the soonest date they play.
+
+    Austin runs on weekly residencies -- Bluegrass Night every Monday, Steel
+    Monday at Sam's Town Point -- so a single act can appear seven times in a
+    six-week window. Left alone, one act can take several of the five slots,
+    and a re-run can surface the same act on a different date, which reads as
+    the app repeating itself. The soonest date is the one the user can act on.
+    """
+    best: dict[str, dict] = {}
+    for show in shows:
+        key = show.get("artist", "").strip().lower()
+        if not key:
+            continue
+        seen = best.get(key)
+        if seen is None or show.get("date", "") < seen.get("date", ""):
+            if seen is not None:
+                show["also_playing"] = seen.get("also_playing", 0) + 1
+            best[key] = show
+        else:
+            seen["also_playing"] = seen.get("also_playing", 0) + 1
+    return list(best.values())
+
+
 def sweep(meter: llm.Meter | None = None, force: bool = False,
           window_days: int | None = None) -> dict:
     """Return {"shows": [...], "days": int, "cached_days": int, "injections": [...]}"""
@@ -98,6 +122,7 @@ def sweep(meter: llm.Meter | None = None, force: bool = False,
                     injections.append({"date": res["date"].isoformat(),
                                        "note": res["injection_note"]})
 
+    shows = collapse(shows)
     shows.sort(key=lambda s: (s.get("date", ""), s.get("artist", "")))
     return {
         "shows": shows,

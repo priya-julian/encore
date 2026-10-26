@@ -760,6 +760,33 @@ but that it finds shows a particular person would have missed. That click is
 the only honest test of it, which is why it is the one thing testers were
 asked to do.</p>
 
+<h3>What testers changed</h3>
+
+<p>Two of the three suggestions that came back from testers were acted on the
+same day, which is the clearest evidence that real users were involved rather
+than consulted after the fact.</p>
+
+<p><b>"I re-ran it and got some repeat shows."</b> Partly expected and partly a
+real modelling gap. Austin runs on weekly residencies &mdash; Bluegrass Night
+at Radio Coffee every Monday, Steel Monday at Sam's Town Point &mdash; so a
+single act can appear seven times in a six-week window, and nothing stopped one
+act taking several of the five slots or resurfacing on a different date. The
+pipeline now keeps one entry per artist at the soonest date they play, noting
+the extra dates on the card, which also cut the shows considered from 412 to
+331 and took about a fifth off the screening cost. Separately, Re-run now
+treats what you were just shown as a rejection for that run, so it means "show
+me something else" rather than returning the same five.</p>
+
+<p><b>"Link the artists so I can hear them."</b> Spotify and Apple Music both
+resolve a plain search URL, so no key is needed; Scholar was already finding
+each artist's own Bandcamp page and discarding it. Every pick now carries all
+three where they exist.</p>
+
+<p>The third suggestion &mdash; ticket prices and live availability &mdash; is
+in section 8. Prices appear in about a dozen of the listings, and availability
+changes faster than any cache can honestly track, so claiming it would mean
+being confidently wrong about something that costs money.</p>
+
 <h3>What testers said</h3>
 
 {quote_html}
@@ -797,6 +824,12 @@ biggest barrier to a new user.</li>
 <li><b>No feedback loop yet.</b> "Not for me" is recorded but does not yet
 feed back into the profile. Treating those clicks as negative signal is the
 most direct path to improving picks over time.</li>
+<li><b>No ticket prices or live availability.</b> Cards link out to the
+listing rather than quoting a price. The source states a price for roughly a
+dozen of its listings, and whether a show has sold out changes faster than a
+twelve-hour cache can track. Fetching each ticket page would add a request per
+show and still be stale; the honest version is a link, and that is what
+section 7 describes testers asking for.</li>
 <li><b>Logs do not survive a redeploy.</b> Identity is a year-long cookie and
 logs are files on disk, which survives restarts but not the host rebuilding
 its filesystem. Mirroring the log into the browser's local storage would fix
