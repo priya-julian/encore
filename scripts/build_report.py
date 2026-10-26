@@ -152,6 +152,7 @@ def build() -> str:
   body {{ font:15px/1.6 Georgia,"Times New Roman",serif; color:#16233a;
           max-width:760px; margin:0 auto; padding:40px 28px 80px; }}
   h1 {{ font-size:30px; margin:0 0 4px; color:var(--dark); line-height:1.2; }}
+  h2.first {{ margin-top:22px; }}
   h2 {{ font-size:20px; margin:38px 0 10px; padding-bottom:6px;
         border-bottom:2px solid var(--line); color:var(--dark); }}
   h2::after {{ content:""; display:block; width:58px; height:3px;
@@ -205,7 +206,11 @@ def build() -> str:
 <p class="sub">Rank the concerts you've been to; Encore reads every Austin
 venue listing and tells you which upcoming shows you'd regret missing.</p>
 
+<h2 class="first">1. Title and links</h2>
+
 <div class="links">
+  <div><b>Project</b> Encore &mdash; concert discovery driven by your own
+    show history</div>
   <div><b>Student</b> Priya Julian</div>
   <div><b>Course</b> MGT 409, Fall 2026</div>
   <div><b>Repo</b> <a href="{REPO_URL}">{REPO_URL}</a>
@@ -214,7 +219,7 @@ venue listing and tells you which upcoming shows you'd regret missing.</p>
   <div><b>Model</b> {t["model"]} via PORTKEY_API_KEY</div>
 </div>
 
-<h2>1. Motivation</h2>
+<h2>2. Motivation</h2>
 
 <p>Austin has more live music per capita than anywhere in the United States.
 On a single Friday night in October 2026, Encore's sweep found
@@ -254,7 +259,7 @@ one missed show a month, the thing Encore is competing with is not another app
 &mdash; it is the half hour a week nobody spends, and the shows that quietly
 pass by as a result.</p>
 
-<h2>2. What is new</h2>
+<h2>3. What is new here</h2>
 
 <p>Rating and logging apps exist for most media: Letterboxd for film,
 Goodreads for books, Beli for restaurants. Each is a social network with a
@@ -285,7 +290,7 @@ ratings in existing apps are used to rank what you already chose; here they
 are used to rule things out.</li>
 </ul>
 
-<h2>3. Agents</h2>
+<h2>4. The agents</h2>
 
 <p>Five agents, each with a different input, a different failure mode, and a
 different cost profile. The division is not decorative: Scout does structured
@@ -323,7 +328,7 @@ would be the obvious design and a bad one. Instead the Ranker screens all
 deliberately harsh, most shows score below 40 &mdash; and only the top 14
 receive Scholar research and careful ranking. That single ordering decision is
 the difference between a run costing cents and a run costing dollars, and it
-is the backbone of section 5.</p>
+is the backbone of section 6.</p>
 
 <h3>Which model, and why</h3>
 
@@ -488,7 +493,7 @@ to a local band in the log.</p>
      "The log: 31 shows, grouped by rating. This is the only input that "
      "distinguishes Encore from a generic recommender.")}
 
-<h2>4. Tokenomics</h2>
+<h2>5. Tokenomics</h2>
 
 <p>Every model call in the app passes through one metered wrapper that records
 prompt tokens, completion tokens and latency per agent. The numbers below were
@@ -521,6 +526,11 @@ which is cheaper than any discount on a call that still happens. Of the
 {cold["model_calls"]} calls in a cold run, none reuse a cached prefix; of the
 {warm["model_calls"]} in a warm one, the {warm["cache_hits"]} avoided calls
 cost exactly nothing rather than a tenth of something.</p>
+
+{img("meter.jpg", "Encore showing its own token usage beneath the picks",
+     "Encore reports its own cost on every run: shows considered, wall time, "
+     "dollars, model calls and cache hits. This run was served warm, so 43 "
+     "of its stages came from cache.")}
 
 <h3>Where the money goes, and what was done about it</h3>
 
@@ -621,9 +631,9 @@ be approximately right, and the final ranker reconsiders the survivors
 carefully. Running batches concurrently took the full pipeline from 195
 seconds to under 20 with no change in cost. The model does not accept a
 temperature setting, so identical inputs can yield slightly different
-orderings between runs; this is visible and discussed in section 7.</p>
+orderings between runs; this is visible and discussed in section 8.</p>
 
-<h2>5. Safety</h2>
+<h2>6. Safety</h2>
 
 <p>Encore reads untrusted third-party web content and then makes claims that
 cost money to act on. Two risks follow, and both have built defences that are
@@ -715,7 +725,7 @@ an artist name &mdash; never an IP address, a user agent or anything that
 identifies a person. The logs of the people who tested Encore were never read
 individually; only the aggregate counts in the next section were.</p>
 
-<h2>6. Impact</h2>
+<h2>7. Impact</h2>
 
 <div class="kpis">
   <div class="kpi"><b>{impact["sessions"]}</b><span>people used it</span></div>
@@ -810,10 +820,10 @@ ACL Live as a top pick. I had independently been considering that show, and
 had not told the system about it &mdash; it was selected from
 {cold["shows_considered"]} candidates on the strength of 31 rated shows. Two
 further picks, Julia Jacklin and Slow Pulp, are artists I listen to but had not
-known were playing Austin. That is the target outcome stated in section 1: the
+known were playing Austin. That is the target outcome stated in section 2: the
 show you would have found out about too late.</p>
 
-<h2>7. Limits and next steps</h2>
+<h2>8. Limits and next steps</h2>
 
 <ul>
 <li><b>One city, one listing source.</b> Austin coverage depends on a single
