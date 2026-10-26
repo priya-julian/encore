@@ -10,5 +10,10 @@
   {
     "text": "Great way to discover new artists!",
     "who": "tester"
+  },
+  {
+    "text": "I love that the app recommended artists I actually listen to that I did not realize were touring right now.",
+    "who": "Priya Julian, who built Encore",
+    "author": true
   }
 ]

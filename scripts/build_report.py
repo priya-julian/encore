@@ -121,12 +121,17 @@ def build() -> str:
 
     q, small, big = load_quality()
     quotes = load_quotes()
-    if quotes:
+    # The author's own experience is real evidence, but it is not a user
+    # test. It is attributed and kept apart from the testers' words so the
+    # two are never read as the same thing.
+    testers = [x for x in quotes if not x.get("author")]
+    mine = [x for x in quotes if x.get("author")]
+    if testers:
         quote_html = "".join(
             f'<blockquote>&ldquo;{x["text"]}&rdquo;'
             f'<br><span class="s">&mdash; {x.get("who", "tester")}</span>'
             "</blockquote>"
-            for x in quotes
+            for x in testers
         )
     else:
         quote_html = (
@@ -791,7 +796,14 @@ being confidently wrong about something that costs money.</p>
 
 {quote_html}
 
-<h3>Evidence so far</h3>
+<h3>My own use of it</h3>
+
+<p>I am also a user of this app, and that is worth separating from the
+testers above rather than blending into them.</p>
+
+{"".join(
+    '<blockquote>&ldquo;' + x["text"] + '&rdquo;<br><span class="s">&mdash; '
+    + x.get("who", "the author") + '</span></blockquote>' for x in mine)}
 
 <p>The first end-to-end run against my real log returned Adrianne Lenker at
 ACL Live as a top pick. I had independently been considering that show, and
