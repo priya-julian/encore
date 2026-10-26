@@ -62,3 +62,11 @@
 {"ts": 1793040547.2, "kind": "run", "session": "653f726cf127", "count": 5, "considered": 446, "cached": true, "cost": 0.01774}
 {"ts": 1793040684.7, "kind": "add_bulk", "session": "02afed501033", "count": 8}
 {"ts": 1793040739.3, "kind": "run", "session": "02afed501033", "count": 5, "considered": 446, "cached": false, "cost": 0.01249}
+{"ts": 1793041832.0, "kind": "add_bulk", "session": "193b1e1e4232", "count": 5}
+{"ts": 1793041882.7, "kind": "run", "session": "193b1e1e4232", "count": 5, "considered": 446, "cached": false, "cost": 0.01105}
+{"ts": 1793041914.1, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "Adrianne Lenker"}
+{"ts": 1793041915.7, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "Julia Jacklin"}
+{"ts": 1793041916.6, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "Wednesday"}
+{"ts": 1793041918.1, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "OSEES"}
+{"ts": 1793041919.6, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "Slow Pulp"}
+{"ts": 1793041942.3, "kind": "save", "session": "193b1e1e4232", "artist": "Julia Jacklin"}
