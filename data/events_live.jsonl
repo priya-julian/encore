@@ -70,3 +70,6 @@
 {"ts": 1793041918.1, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "OSEES"}
 {"ts": 1793041919.6, "kind": "new_to_me", "session": "193b1e1e4232", "artist": "Slow Pulp"}
 {"ts": 1793041942.3, "kind": "save", "session": "193b1e1e4232", "artist": "Julia Jacklin"}
+{"ts": 1793043259.2, "kind": "add_bulk", "session": "bd300a5ca40f", "count": 4}
+{"ts": 1793043313.1, "kind": "run", "session": "bd300a5ca40f", "count": 5, "considered": 352, "cached": false, "cost": 0.00992, "shown": ["Wednesday", "Julia Jacklin", "Slow Pulp", "The Tubs", "Buzzcocks"]}
+{"ts": 1793043365.4, "kind": "run", "session": "bd300a5ca40f", "count": 5, "considered": 347, "cached": false, "cost": 0.01055, "shown": ["Gully Boys", "All Get Out", "Slothrust", "The Linda Lindas", "Adrianne Lenker"]}

@@ -28,6 +28,24 @@ LIVE_PATH = config.DATA_DIR / "events_live.jsonl"
 BASELINE_PATH = config.DATA_DIR / "events_baseline.json"
 
 
+EXCLUDE_PATH = config.DATA_DIR / "exclude_sessions.json"
+
+
+def excluded_sessions() -> set:
+    """Sessions that are not real users.
+
+    Deleting them from the file does not work: the next fetch pulls them
+    back from the deployed app. They are listed here instead, so the
+    exclusion survives every refresh.
+    """
+    if not EXCLUDE_PATH.is_file():
+        return set()
+    try:
+        return {s[:12] for s in json.loads(EXCLUDE_PATH.read_text())}
+    except (json.JSONDecodeError, OSError, TypeError):
+        return set()
+
+
 def baseline_ts() -> float:
     """Timestamp before which events are developer testing, not real usage.
 
@@ -103,7 +121,9 @@ def summary(path: Path | None = None) -> dict:
     rows = load(path)
     if path is not None:
         cutoff = baseline_ts()
-        rows = [r for r in rows if r.get("ts", 0) > cutoff]
+        skip = excluded_sessions()
+        rows = [r for r in rows
+                if r.get("ts", 0) > cutoff and r.get("session") not in skip]
 
     kinds: dict = {}
     per_session: dict = {}
