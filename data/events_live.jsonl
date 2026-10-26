@@ -73,3 +73,5 @@
 {"ts": 1793043259.2, "kind": "add_bulk", "session": "bd300a5ca40f", "count": 4}
 {"ts": 1793043313.1, "kind": "run", "session": "bd300a5ca40f", "count": 5, "considered": 352, "cached": false, "cost": 0.00992, "shown": ["Wednesday", "Julia Jacklin", "Slow Pulp", "The Tubs", "Buzzcocks"]}
 {"ts": 1793043365.4, "kind": "run", "session": "bd300a5ca40f", "count": 5, "considered": 347, "cached": false, "cost": 0.01055, "shown": ["Gully Boys", "All Get Out", "Slothrust", "The Linda Lindas", "Adrianne Lenker"]}
+{"ts": 1793043756.4, "kind": "add_bulk", "session": "c1f358b16d0e", "count": 5}
+{"ts": 1793043809.5, "kind": "run", "session": "c1f358b16d0e", "count": 5, "considered": 352, "cached": false, "cost": 0.01051, "shown": ["OSEES", "Paul Cauthen", "The War And Treaty", "Band Of Horses", "Buzzcocks"]}
