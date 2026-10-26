@@ -54,6 +54,23 @@ def load_quality() -> tuple[dict, dict, dict]:
     return data, small, big
 
 
+def load_quotes() -> list[dict]:
+    """Tester quotes, if any have been collected.
+
+    The impact row's named evidence is "a real user tried it (a quote,
+    screenshot, or before-and-after time)", so a verbatim line from a tester
+    is worth more than another counter. Drop them in data/quotes.json; see
+    data/quotes.example.json for the shape.
+    """
+    path = ROOT / "data" / "quotes.json"
+    if not path.is_file():
+        return []
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return []
+
+
 def load_impact() -> dict:
     """Usage from the deployed app, falling back to local events.
 
@@ -103,6 +120,21 @@ def build() -> str:
     rate = t["rate_card_usd_per_1m"]
 
     q, small, big = load_quality()
+    quotes = load_quotes()
+    if quotes:
+        quote_html = "".join(
+            f'<blockquote>&ldquo;{x["text"]}&rdquo;'
+            f'<br><span class="s">&mdash; {x.get("who", "tester")}</span>'
+            "</blockquote>"
+            for x in quotes
+        )
+    else:
+        quote_html = (
+            '<p class="todo">Tester quotes go here. Collect a line or two, '
+            "put them in <code>data/quotes.json</code> (see "
+            "<code>data/quotes.example.json</code>), and rerun "
+            "<code>scripts/build_report.py</code>.</p>"
+        )
     saving = (1 - warm["cost_usd"] / cold["cost_usd"]) * 100
     speedup = cold["seconds"] / warm["seconds"]
 
@@ -727,6 +759,10 @@ that it finds good shows &mdash; a list of every Austin gig does that &mdash;
 but that it finds shows a particular person would have missed. That click is
 the only honest test of it, which is why it is the one thing testers were
 asked to do.</p>
+
+<h3>What testers said</h3>
+
+{quote_html}
 
 <h3>Evidence so far</h3>
 

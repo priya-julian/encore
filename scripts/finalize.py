@@ -65,6 +65,11 @@ def audit() -> list[tuple[bool, str]]:
                            capture_output=True, text=True).stdout.strip()
     checks.append((not clean, "working tree clean / everything pushed"))
 
+    quotes = ROOT / "data" / "quotes.json"
+    checks.append((quotes.is_file(),
+                   "tester quote collected (data/quotes.json) — "
+                   "the impact row's named evidence"))
+
     stats = events.summary(events.LIVE_PATH)
     checks.append((stats["sessions"] > 0,
                    f"real usage recorded ({stats['sessions']} people, "
